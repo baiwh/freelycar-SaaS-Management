@@ -1,26 +1,33 @@
 <template>
   <div>
     <!--选择区间-->
-    <el-row>
-      <el-col :span="8">
-        <el-radio-group v-model="tabPosition" @change="onButtonChange">
+    <el-row :gutter="5">
+      <el-col :span="7">
+        <span>所属门店：</span>
+        <el-select v-model="selectValue" placeholder="请选择" style="width: 10vw" size="small">
+          <el-option v-for="item in selectOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="6">
+        <el-radio-group v-model="tabPosition" @change="onButtonChange" size="small">
           <el-radio-button label="today">今日</el-radio-button>
           <el-radio-button label="thisMonth">本月</el-radio-button>
           <el-radio-button label="search">区间查找</el-radio-button>
         </el-radio-group>
       </el-col>
-      <el-col :span="12" v-if="visible">
-        <span>区间查找</span>
+      <el-col :span="9" v-if="visible">
+        <span>查找日期：</span>
         <el-date-picker
           v-model="datePickerValue"
           type="daterange"
           range-separator="~"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
-          class="dateWidth">
+          style="width:17vw"
+          size="small">
         </el-date-picker>
       </el-col>
-      <el-col :span="4" :offset="num">
+      <el-col :span="2" :offset="num">
         <el-button type="primary" size="small" icon="el-icon-download">导出Excel</el-button>
       </el-col>
     </el-row>
@@ -45,11 +52,11 @@
         </div>
         <el-table v-loading="loading" :data="amountMethodsTable">
           <el-table-column property="crash" label="现金" align="center"/>
-          <el-table-column property="swipe" label="刷卡" align="center"/>
-          <el-table-column property="easyPay" label="易付宝" align="center"/>
+          <el-table-column property="weChatPay" label="微信" align="center"/>
           <el-table-column property="aLiPay" label="支付宝" align="center"/>
-          <el-table-column property="weChatPay" label="微信支付" align="center"/>
-          <el-table-column property="cardPay" label="储值卡支付" align="center"/>
+          <el-table-column property="swipe" label="刷卡" align="center"/>
+          <el-table-column property="cardPay" label="储值卡" align="center"/>
+          <el-table-column property="easyPay" label="抵用券" align="center"/>
         </el-table>
       </el-card>
     </el-row>
@@ -78,6 +85,11 @@
     data() {
       return {
         loading: true,
+        selectValue: '',
+        selectOptions: [{
+          label: 'aa',
+          value: 'aa'
+        }],
         tabPosition: 'today',
         datePickerValue: '',
         dataReportCard: [{
@@ -108,13 +120,13 @@
           itemPrice: '80'
         }],
         visible: false,
-        num: 12
+        num: 9
       }
     },
     methods: {
       onButtonChange(e) {
         this.visible = e === 'search' ? true : false
-        this.num = e === 'search' ? 0 : 12
+        this.num = e === 'search' ? 0 : 9
       }
     },
     mounted: function () {
@@ -124,10 +136,6 @@
 </script>
 
 <style lang="less" scoped>
-  .dateWidth {
-    width: 70%;
-  }
-
   .clearfix:before,
   .clearfix:after {
     display: table;
