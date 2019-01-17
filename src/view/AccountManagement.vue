@@ -52,6 +52,11 @@
       </el-table-column>
     </el-table>
 
+    <!--分页器-->
+    <pagingDevice
+      :pageData.sync="pageData"
+      @changePage="changePage"></pagingDevice>
+
     <!--新增、修改账号-->
     <el-dialog :title="newOrChange" :visible.sync="isShow">
       <!--账号信息-->
@@ -148,7 +153,12 @@
           phone: ''
         },
         innerTableData: [],
-        isSetting: false
+        isSetting: false,
+        pageData: {
+          currentPage: 1,
+          pageSize: 10,
+          pageTotal: 100
+        }
       }
     },
     methods: {
@@ -167,7 +177,8 @@
       },
       onPermission() {
         this.isSetting = true
-      }
+      },
+      changePage() {}
     },
     mounted: function () {
 
