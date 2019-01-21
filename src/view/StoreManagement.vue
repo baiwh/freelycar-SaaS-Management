@@ -52,12 +52,12 @@
       </el-table-column>
       <el-table-column label="上移" width="75">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="handleModify(true,scope.row)">上移</el-button>
+          <el-button size="mini" type="primary">上移</el-button>
         </template>
       </el-table-column>
       <el-table-column label="下移" width="75">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="handleModify(true,scope.row)">下移</el-button>
+          <el-button size="mini" type="primary">下移</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -82,7 +82,7 @@
             <el-button size="mini" type="text" @click="show = false">取消</el-button>
             <el-button type="primary" size="mini" @click="show = false">确定</el-button>
           </div>
-          <el-button size="mini" type="primary" slot="reference" plain>默认列表</el-button>
+          <el-button size="small" type="primary" slot="reference" plain>默认列表</el-button>
         </el-popover>
       </el-col>
     </el-row>
@@ -170,7 +170,7 @@
   }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .el-row {
   margin-bottom: 30px;
 }
