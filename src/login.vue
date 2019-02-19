@@ -81,7 +81,8 @@
             if (this.checked) {
               let time = new Date()
               let nowTime = time.getTime()
-              document.cookie = "jwt=" + res + "; expires=" + new Date(nowTime + 5 * 24 * 60 * 60 * 1000)
+              time.setTime(nowTime + 5 * 24 * 60 * 60 * 1000)
+              document.cookie = "jwt=" + res + "; expires=" + time.toGMTString() + ";path=/"
             }
             this.$router.push('/home')
           }

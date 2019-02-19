@@ -4,19 +4,19 @@
     <el-row :gutter="5">
       <el-col :span="9">
         <span>所属门店：</span>
-        <el-select v-model="selectValue" placeholder="请选择" style="width: 16vw" size="small">
-          <el-option v-for="item in selectOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        <el-select v-model="selectStore" placeholder="请选择" style="width: 16vw" size="small">
+          <el-option v-for="item in storeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-col>
       <el-col :span="3">
-        <el-button type="primary" size="small">查询</el-button>
+        <el-button type="primary" size="small" @click="getList">查询</el-button>
       </el-col>
     </el-row>
 
     <!--两个按钮-->
     <el-row :gutter="30">
       <el-col :span="4">
-        <el-button type="primary" size="small" plain @click="handleModify(false)">新增账号</el-button>
+        <el-button type="primary" size="small" plain @click="addNewAccount">新增账号</el-button>
       </el-col>
       <el-col :span="4">
         <el-button type="primary" size="small" plain @click="allDelete">删除账号</el-button>
@@ -24,23 +24,20 @@
     </el-row>
 
     <!--表格-->
-    <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" border
+    <el-table ref="multipleTable" :data="accountList" tooltip-effect="dark" border
               @selection-change="handleSelectionChange" v-loading="loading">
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="序号" type="index"></el-table-column>
-      <el-table-column prop="storeName" label="所属门店"></el-table-column>
-      <el-table-column prop="owner" label="账号使用者"></el-table-column>
-      <el-table-column prop="name" label="用户名"></el-table-column>
+      <el-table-column prop="storeId" label="所属门店"></el-table-column>
+      <el-table-column prop="staffName" label="账号使用者"></el-table-column>
+      <el-table-column prop="username" label="用户名"></el-table-column>
       <el-table-column prop="phone" label="手机号"></el-table-column>
-      <el-table-column prop="comment" label="备注" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="260">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="onPermission">权限设置</el-button>
-          <el-button size="mini" type="primary" @click="handleModify(true,scope.row)">修改</el-button>
-          <el-popover
-            placement="top"
-            width="160"
-            :ref="scope.$index">
+          <el-button size="mini" type="primary" @click="permissionSettings">权限设置</el-button>
+          <el-button size="mini" type="primary" @click="handleModify(scope.row)">修改</el-button>
+          <el-popover placement="top" width="160" :ref="scope.$index">
             <p>确定删除本条抵用券？</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="handleClose(scope.$index)">取消</el-button>
@@ -53,69 +50,67 @@
     </el-table>
 
     <!--分页器-->
-    <pagingDevice
-      :pageData.sync="pageData"
-      @changePage="changePage"></pagingDevice>
+    <pagingDevice :pageData.sync="pageData" @changePage="getList"></pagingDevice>
 
     <!--新增、修改账号-->
     <el-dialog :title="newOrChange" :visible.sync="isShow">
       <!--账号信息-->
       <el-row>
-          <el-col :span="4" :offset="2">所属门店：</el-col>
-          <el-col :span="18">
-            <el-select v-model="dialog.selectValue" placeholder="请选择" style="width: 80%">
-              <el-option v-for="item in selectOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
-            </el-select>
-          </el-col>
-        </el-row>
+        <el-col :span="4" :offset="2">所属门店：</el-col>
+        <el-col :span="18">
+          <el-select v-model="accountInfo.storeId" placeholder="请选择" style="width: 80%">
+            <el-option v-for="item in storeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-col>
+      </el-row>
       <el-row>
-          <el-col :span="4" :offset="2">卡名称：</el-col>
-          <el-col :span="18">
-            <el-input v-model="dialog.cardName" style="width: 80%" size="small"></el-input>
-          </el-col>
-        </el-row>
+        <el-col :span="4" :offset="2">使用者：</el-col>
+        <el-col :span="18">
+          <el-input v-model="accountInfo.staffName" style="width: 80%" size="small"></el-input>
+        </el-col>
+      </el-row>
       <el-row>
-          <el-col :span="4" :offset="2">用户名：</el-col>
-          <el-col :span="18">
-            <el-input v-model="dialog.sellPrice" style="width: 80%" size="small"></el-input>
-          </el-col>
-        </el-row>
+        <el-col :span="4" :offset="2">用户名：</el-col>
+        <el-col :span="18">
+          <el-input v-model="accountInfo.username" style="width: 80%" size="small"></el-input>
+        </el-col>
+      </el-row>
       <el-row>
-          <el-col :span="4" :offset="2">密码：</el-col>
-          <el-col :span="18">
-            <el-input v-model="dialog.cardPrice" style="width: 80%" size="small"></el-input>
-          </el-col>
-        </el-row>
+        <el-col :span="4" :offset="2">密码：</el-col>
+        <el-col :span="18">
+          <el-input v-model="accountInfo.password" style="width: 80%" size="small"></el-input>
+        </el-col>
+      </el-row>
       <el-row>
-          <el-col :span="4" :offset="2">手机号：</el-col>
-          <el-col :span="18">
-            <el-input v-model="dialog.phone" style="width: 80%" size="small"></el-input>
-          </el-col>
-        </el-row>
+        <el-col :span="4" :offset="2">手机号：</el-col>
+        <el-col :span="18">
+          <el-input v-model="accountInfo.phone" style="width: 80%" size="small"></el-input>
+        </el-col>
+      </el-row>
       <el-row>
-          <el-col :span="4" :offset="2">备注：</el-col>
-          <el-col :span="18">
-            <el-input  type="textarea" :rows="2" placeholder="请输入内容" v-model="input" style="width:80%"></el-input>
-          </el-col>
-        </el-row>
+        <el-col :span="4" :offset="2">备注：</el-col>
+        <el-col :span="18">
+          <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="accountInfo.remark" style="width:80%"></el-input>
+        </el-col>
+      </el-row>
 
       <!--权限设置-->
       <el-row>
         <el-col :span="3" :offset="10">
-          <el-button type="primary" size="small" plain @click="onPermission">权限设置</el-button>
+          <el-button type="primary" size="small" plain @click="permissionSettings">权限设置</el-button>
         </el-col>
       </el-row>
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="isShow = false">取 消</el-button>
-        <el-button type="primary" @click="isShow = false">确 定</el-button>
+        <el-button type="primary" @click="accountSubmit">确 定</el-button>
       </div>
     </el-dialog>
 
     <!--权限设置-->
     <el-dialog title="权限设置" :visible.sync="isSetting">
       <el-table ref="multipleTable" :data="innerTableData" tooltip-effect="dark" border
-                @selection-change="handleSelectionChange" v-loading="loading">
+                @selection-change="settingSelectionChange" v-loading="loading">
         <el-table-column type="selection" width="100" align="center"></el-table-column>
         <el-table-column label="序号" type="index" width="150" align="center"></el-table-column>
         <el-table-column prop="features" label="功能" align="center"></el-table-column>
@@ -123,7 +118,7 @@
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="isSetting = false">取 消</el-button>
-        <el-button type="primary" @click="isSetting = false">确 定</el-button>
+        <el-button type="primary" @click="settingSubmit">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -136,58 +131,163 @@
     data() {
       return {
         input: '',
-        selectValue: '',
-        selectOptions: [{
-          label: 'aa',
-          value: 'aa'
-        }],
-        tableData: [{}],
+        selectStore: '',
+        storeList: [],
+        multipleSelection: [],
+        settingSelection: [],
+        accountList: [],
         loading: '',
         newOrChange: '',
         isShow: false,
-        dialog: {
-          selectValue: '',
-          cardName: '',
-          sellPrice: '',
-          cardPrice: '',
-          phone: ''
+        accountInfo: {
+          id: '',
+          storeId: '',
+          staffName: '',
+          username: '',
+          password: '',
+          phone: '',
+          remark: ''
         },
         innerTableData: [],
         isSetting: false,
         pageData: {
           currentPage: 1,
           pageSize: 10,
-          pageTotal: 100
+          pageTotal: 10
         }
       }
     },
     methods: {
-      handleModify(type) {
-        this.isShow = true;
-        if(type == 1){
-          this.newOrChange = '修改账户'
-        }else {
-          this.newOrChange = '新增账户'
+      // 获取账号列表
+      getList() {
+        this.$get('/sysUser/list', {
+          storeId: this.selectStore,
+          currentPage: this.pageData.currentPage,
+          pageSize: this.pageData.pageSize
+        }).then(res => {
+          this.loading = false
+          this.accountList = res.data
+          this.pageData.currentPage = res.currentPage
+          this.pageData.pageSize = res.pageSize
+          this.pageData.pageTotal = res.total
+        })
+      },
+
+      // 获取门店列表
+      getStoreList() {
+        this.$get('/store/list', {
+          name: '',
+          currentPage: 1,
+          pageSize: 100
+        }).then(res => {
+          this.storeList = res.data
+        })
+      },
+
+      // 新增账户弹框
+      addNewAccount() {
+        this.newOrChange = '新增账户'
+        this.isShow = true
+        this.accountInfo = {
+          id: '',
+          storeId: '',
+          staffName: '',
+          username: '',
+          password: '',
+          phone: '',
+          remark: ''
         }
       },
-      allDelete() {},
-      handleSelectionChange() {},
+
+      // 修改账户弹框
+      handleModify(row) {
+        this.newOrChange = '修改账户'
+        this.isShow = true
+        this.accountInfo=row
+      },
+
+      // 提交新增、修改
+      accountSubmit() {
+        this.isShow = false
+        this.$post('/sysUser/modify', {
+          id: this.accountInfo.id,
+          storeId: this.accountInfo.storeId,
+          staffName: this.accountInfo.staffName,
+          username: this.accountInfo.username,
+          password: this.accountInfo.password,
+          phone: this.accountInfo.phone,
+          remark: this.accountInfo.remark
+        }).then(res => {
+          this.$message({
+            message: '提交成功',
+            type: 'success'
+          })
+          this.getList()
+        })
+      },
+
+      // 删除单个账号
+      handleDelete(row) {
+        this.$get('/sysUser/delete', {
+          id: row.id
+        }).then(res => {
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+          this.getList()
+        })
+      },
+
+      // 批量删除门店
+      allDelete() {
+        let ids = []
+        this.multipleSelection.filter(v => {
+          ids.push(v.id)
+        })
+        this.$post('/sysUser/batchDelete', {
+          ids: ids.join(',')
+        }).then(res => {
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+          this.getList()
+        })
+      },
+
+      // 多选功能
+      handleSelectionChange(val) {
+        this.multipleSelection = val
+      },
+      settingSelectionChange(val) {
+        this.settingSelection = val
+      },
+
+      // 关闭提示框
       handleClose(id) {
         this.$refs[id].doClose()
       },
-      onPermission() {
+
+      // 权限设置弹框
+      permissionSettings() {
         this.isSetting = true
       },
-      changePage() {}
+
+      // 权限设置确定按钮
+      settingSubmit(){
+        this.isSetting = false
+      }
     },
     mounted: function () {
-
+      this.getList()
+      this.getStoreList()
     }
   }
 </script>
 
 <style lang="less" scoped>
-.el-row {
-  margin-bottom: 30px;
-}
+  .el-row {
+    margin-bottom: 30px;
+  }
 </style>
