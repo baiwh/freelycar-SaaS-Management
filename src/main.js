@@ -33,26 +33,26 @@ Vue.prototype.$post = post
 
 Vue.config.productionTip = false
 
-// router.beforeEach((to, from, next) => {
-//   let jwt = document.cookie
-//   if (to.path === '/login') {
-//     next()
-//     return
-//   }
-//   if (jwt!=='') {
-//     if (to.path === '/') {
-//       next({
-//         path: '/home'
-//       })
-//     } else {
-//       next()
-//     }
-//   } else {
-//     next({
-//       path: '/login'
-//     })
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  let jwt = document.cookie
+  if (to.path === '/login') {
+    next()
+    return
+  }
+  if (jwt!=='') {
+    if (to.path === '/') {
+      next({
+        path: '/home'
+      })
+    } else {
+      next()
+    }
+  } else {
+    next({
+      path: '/login'
+    })
+  }
+})
 
 const store = new Vuex.Store({
   state: {
