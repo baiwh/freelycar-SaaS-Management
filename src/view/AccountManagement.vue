@@ -28,7 +28,7 @@
               @selection-change="handleSelectionChange" v-loading="loading">
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="序号" type="index"></el-table-column>
-      <el-table-column prop="storeId" label="所属门店"></el-table-column>
+      <el-table-column prop="storeId" label="所属门店" :formatter="storeFormat"></el-table-column>
       <el-table-column prop="staffName" label="账号使用者"></el-table-column>
       <el-table-column prop="username" label="用户名"></el-table-column>
       <el-table-column prop="phone" label="手机号"></el-table-column>
@@ -267,6 +267,18 @@
       // 关闭提示框
       handleClose(id) {
         this.$refs[id].doClose()
+      },
+
+      // 门店过滤器
+      storeFormat(row){
+        console.log(row)
+        let name = ''
+        this.storeList.map(value => {
+          if(value.id==row.id){
+            name=value.name
+          }
+        })
+        return name
       },
 
       // 权限设置弹框

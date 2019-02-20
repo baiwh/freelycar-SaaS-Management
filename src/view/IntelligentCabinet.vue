@@ -26,7 +26,7 @@
     </el-row>
 
     <!--表格-->
-    <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" border
+    <el-table ref="multipleTable" :data="cabinetList" tooltip-effect="dark" border
               @selection-change="handleSelectionChange" v-loading="loading">
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="序号" type="index"></el-table-column>
@@ -108,7 +108,7 @@
           label: 'aa',
           value: 'aa'
         }],
-        tableData: [{}],
+        cabinetList: [{}],
         pageData: {
           currentPage: 1,
           pageSize: 10,
@@ -119,6 +119,20 @@
       }
     },
     methods: {
+      // 获取智能柜列表
+      getList() {
+        this.$get('', {
+
+        }).then(res => {
+          this.loading = false
+          this.cabinetList = res.data
+          this.pageData.currentPage = res.currentPage
+          this.pageData.pageSize = res.pageSize
+          this.pageData.pageTotal = res.total
+        })
+      },
+
+
       handleModify(type) {
         this.isShow = true;
         if(type == false) {
