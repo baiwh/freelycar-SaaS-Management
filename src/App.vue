@@ -13,8 +13,13 @@
     beforeCreate(){
       let cookie = document.cookie
       if (cookie !== '') {
-        let jwt = cookie.split('=')
-        this.axios.defaults.headers.common["Authorization"] = jwt[1]
+        let cookieArr=cookie.split('; ')
+        let cookieObj={}
+        cookieArr.forEach(value => {
+          let newValue=value.split('=')
+          cookieObj[newValue[0]]=newValue[1]
+        })
+        this.axios.defaults.headers.common["Authorization"] = cookieObj.jwtSuperAdmin
       }
     }
   }

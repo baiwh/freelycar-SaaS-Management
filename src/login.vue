@@ -83,7 +83,7 @@
                 let time = new Date()
                 let nowTime = time.getTime()
                 time.setTime(nowTime + 5 * 24 * 60 * 60 * 1000)
-                document.cookie = "jwt=" + res + "; expires=" + time.toGMTString() + ";path=/"
+                document.cookie = "jwtSuperAdmin=" + res + "; expires=" + time.toGMTString() + ";path=/"
               }
               this.$router.push('/home')
             }
