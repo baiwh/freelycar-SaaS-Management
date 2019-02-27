@@ -52,7 +52,7 @@
 
             <el-submenu index="统计报表">
               <template slot="title">
-                <i class="el-icon-service"></i>
+                <i class="el-icon-star-on"></i>
                 <span>统计报表</span>
               </template>
               <el-menu-item index="/StatisticalReportForms/IncomeInquiry"
@@ -151,6 +151,10 @@
   }
 
   .el-aside {
+    overflow: hidden;
+  }
+
+  .el-menu--inline {
     overflow: hidden;
   }
 
