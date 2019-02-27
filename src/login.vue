@@ -71,23 +71,30 @@
     methods: {
       // 登录
       logIn() {
-        this.$post('/login', {
-          username: this.form.userName,
-          password: this.form.passWord
-        }).then((res) => {
-          console.log(res)
-          if (res) {
-            this.axios.defaults.headers.common["Authorization"] = res
-            if (this.checked) {
-              let time = new Date()
-              let nowTime = time.getTime()
-              time.setTime(nowTime + 5 * 24 * 60 * 60 * 1000)
-              document.cookie = "jwt=" + res + "; expires=" + time.toGMTString() + ";path=/"
+        if (this.form.userName === 'sysadmin') {
+          this.$post('/login', {
+            username: this.form.userName,
+            password: this.form.passWord
+          }).then((res) => {
+            console.log(res)
+            if (res) {
+              this.axios.defaults.headers.common["Authorization"] = res
+              if (this.checked) {
+                let time = new Date()
+                let nowTime = time.getTime()
+                time.setTime(nowTime + 5 * 24 * 60 * 60 * 1000)
+                document.cookie = "jwt=" + res + "; expires=" + time.toGMTString() + ";path=/"
+              }
+              this.$router.push('/home')
             }
-            this.$router.push('/home')
-          }
-        })
-      }
+          })
+        } else {
+          this.$message({
+            message: '账号不正确',
+            type: 'error'
+          })
+        }
+      },
     }
   }
 </script>
