@@ -8,12 +8,12 @@
             <img class="logo" src="./../../static/logo-white.png" alt="">
           </el-col>
           <el-col :span="2">
-            <el-dropdown>
+            <el-dropdown @command="logOut">
               <span class="el-dropdown-link">
                 <span class="user-name">{{userName}}<i class="el-icon-arrow-down el-icon--right"></i></span>
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item @click="logOut">退出登录</el-dropdown-item>
+                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </el-col>
@@ -119,8 +119,13 @@
     },
     methods: {
       // 退出登录
-      logOut(){
-
+      logOut(command){
+        let time = new Date()
+        let nowTime = time.getTime()
+        time.setTime(nowTime)
+        document.cookie = "jwtSuperAdmin=''; expires=" + time.toGMTString() + ";path=/"
+        console.log(document.cookie)
+        this.$router.push({path: '/login'})
       },
       // 收起/打开左侧导航
       modifyNav() {
