@@ -81,6 +81,7 @@ export default new Router({
     },
 
   ],
+  base: '/management/',
   mode: 'history',
 })
 

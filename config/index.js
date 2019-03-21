@@ -12,8 +12,8 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'http://www.pwai.net.cn/SaaS',
-        // target: 'http://192.168.0.167:8080',
+        // target: 'http://www.pwai.net.cn/SaaS',
+        target: 'http://www.freelycar.com:8080',
         secure: false,
         changeOrigin: true,
         withCredentials: false,
@@ -53,7 +53,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: '/management/',
 
     /**
      * Source Maps
