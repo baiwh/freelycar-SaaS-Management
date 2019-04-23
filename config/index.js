@@ -13,18 +13,18 @@ module.exports = {
     proxyTable: {
       '/api': {
         // target: 'http://www.pwai.net.cn/SaaS',
-        target: 'http://www.freelycar.com:8080',
+        target: 'https://www.freelycar.com',
         secure: false,
         changeOrigin: true,
         withCredentials: false,
         pathRewrite: {
-          '^/api': ''
+          // '^/api': ''
         }
       }
     },
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
-    port: 8081, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+    port: 80, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: true,
     errorOverlay: true,
     notifyOnErrors: true,

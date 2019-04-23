@@ -4,7 +4,7 @@
     <el-row :gutter="5">
       <el-col :span="9">
         <span>所属门店：</span>
-        <el-select v-model="selectStore" placeholder="请选择" style="width: 16vw" size="small">
+        <el-select clearable v-model="selectStore" placeholder="请选择" style="width: 16vw" size="small">
           <el-option v-for="item in storeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-col>
@@ -274,7 +274,7 @@
         console.log(row)
         let name = ''
         this.storeList.map(value => {
-          if(value.id==row.id){
+          if(value.id==row.storeId){
             name=value.name
           }
         })
