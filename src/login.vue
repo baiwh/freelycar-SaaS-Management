@@ -12,21 +12,15 @@
       <el-form ref="form" :model="form">
 
         <el-form-item>
-          <el-input
-            class="log-in-input"
-            placeholder="请输入用户名"
-            prefix-icon="el-icon-search"
-            v-model="form.userName">
+          <el-input class="log-in-input" placeholder="请输入用户名"
+                    prefix-icon="el-icon-search" v-model="form.userName">
           </el-input>
         </el-form-item>
 
         <el-form-item>
-          <el-input
-            class="log-in-input"
-            type="password"
-            placeholder="请输入密码"
-            prefix-icon="el-icon-search"
-            v-model="form.passWord">
+          <el-input class="log-in-input" type="password" placeholder="请输入密码"
+                    prefix-icon="el-icon-search" v-model="form.passWord"
+                    @keyup.enter.native="logIn">
           </el-input>
         </el-form-item>
 
