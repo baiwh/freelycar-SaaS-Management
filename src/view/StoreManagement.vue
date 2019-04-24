@@ -224,7 +224,7 @@
       // 批量删除门店
       allDelete() {
         let ids = []
-        this.multipleSelection.filter(v => {
+        this.multipleSelection.forEach(v => {
           ids.push(v.id)
         })
         this.$post('/store/batchDelete',{
