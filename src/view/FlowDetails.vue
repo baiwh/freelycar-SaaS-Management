@@ -10,14 +10,8 @@
       </el-col>
       <el-col :span="12">
         <span>选择查找日期:</span>
-        <el-date-picker
-          v-model="datePickerValue"
-          type="daterange"
-          size="small"
-          range-separator="~"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期">
-        </el-date-picker>
+        <el-date-picker v-model="datePickerValue" type="daterange" size="small" range-separator="~"
+          start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-col>
       <el-col :span="2">
         <el-button type="primary" size="small" @click="getData">查询</el-button>
@@ -33,10 +27,9 @@
         <span>合计金额：</span>
         <el-input :value="sumAmounts" size="small" disabled></el-input>
       </el-col>
-
     </el-row>
 
-    <el-table v-loading="loading" :data="flowDetailsTable" border>
+    <el-table v-loading="loading" :data="flowDetailsTable" @row-click="thisFlowDetail" border>
       <el-table-column type="index" label="序号" align="center"></el-table-column>
       <el-table-column property="carBrand" label="车型" align="center"></el-table-column>
       <el-table-column property="licensePlate" label="车牌号码" align="center"></el-table-column>
@@ -49,10 +42,35 @@
     </el-table>
 
     <!--分页器-->
-    <pagingDevice
-      :pageData.sync="pageData"
-      @changePage="getData"></pagingDevice>
+    <pagingDevice :pageData.sync="pageData" @changePage="getData"></pagingDevice>
 
+    <!--单据详情弹框-->
+    <el-dialog title="单据详情" :visible.sync="dialogTableVisible">
+      <el-row>
+        <el-col :span="12">车型：{{flowDetail}}</el-col>
+        <el-col :span="12">车牌号码：{{flowDetail}}</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">车主姓名：{{flowDetail}}</el-col>
+        <el-col :span="12">联系方式：{{flowDetail}}</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">消费项目：{{flowDetail}}</el-col>
+        <el-col :span="12">时间：{{flowDetail}}</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">消费门店：{{flowDetail}}</el-col>
+        <el-col :span="12">是否会员：{{flowDetail}}</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">会员卡余额：{{flowDetail}}</el-col>
+        <el-col :span="12">订单金额：{{flowDetail}}</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">支付金额：{{flowDetail}}</el-col>
+        <el-col :span="12">支付方式：{{flowDetail}}</el-col>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 
@@ -71,7 +89,9 @@
           currentPage: 1,
           pageSize: 10,
           pageTotal: 100
-        }
+        },
+        flowDetail:'hehe',
+        dialogTableVisible:false
       }
     },
     methods: {
@@ -91,6 +111,12 @@
           this.pageData.pageSize = res.pageSize
           this.pageData.pageTotal = res.total
         })
+      },
+
+      // 查看单据详情
+      thisFlowDetail(row){
+        console.log(row)
+        this.dialogTableVisible=true
       },
 
       // 获取门店列表
