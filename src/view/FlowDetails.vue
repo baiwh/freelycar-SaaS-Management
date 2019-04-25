@@ -105,8 +105,8 @@
           endTime: this.datePickerValue ? this.datePickerValue[1] : ''
         }).then(res => {
           this.loading = false
-          this.sumAmounts = res.total
-          this.flowDetailsTable = res.data
+          this.sumAmounts = res.totalAccount
+          this.flowDetailsTable = res.pageResult.data
           this.pageData.currentPage = res.currentPage
           this.pageData.pageSize = res.pageSize
           this.pageData.pageTotal = res.total
