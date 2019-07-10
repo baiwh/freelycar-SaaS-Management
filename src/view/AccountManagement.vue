@@ -90,7 +90,8 @@
       <el-row>
         <el-col :span="4" :offset="2">备注：</el-col>
         <el-col :span="18">
-          <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="accountInfo.remark" style="width:80%"></el-input>
+          <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="accountInfo.remark"
+                    style="width:80%"></el-input>
         </el-col>
       </el-row>
 
@@ -203,7 +204,8 @@
       handleModify(row) {
         this.newOrChange = '修改账户'
         this.isShow = true
-        this.accountInfo=row
+        this.accountInfo = row
+        this.accountInfo.password = ''
       },
 
       // 提交新增、修改
@@ -270,12 +272,12 @@
       },
 
       // 门店过滤器
-      storeFormat(row){
+      storeFormat(row) {
         console.log(row)
         let name = ''
         this.storeList.map(value => {
-          if(value.id==row.storeId){
-            name=value.name
+          if (value.id == row.storeId) {
+            name = value.name
           }
         })
         return name
@@ -287,7 +289,7 @@
       },
 
       // 权限设置确定按钮
-      settingSubmit(){
+      settingSubmit() {
         this.isSetting = false
       }
     },
