@@ -148,7 +148,7 @@
 <style lang="less">
   .logo {
     height: 55px;
-    width: 185px;
+    width: 165px;
   }
 
   .el-submenu-margin {
