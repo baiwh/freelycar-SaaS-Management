@@ -4,8 +4,11 @@
     <el-row :gutter="5">
       <el-col :span="7">
         <span>所属门店：</span>
-        <el-select clearable v-model="selectStore" placeholder="请选择" style="width: 10vw" size="small">
-          <el-option v-for="item in storeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        <el-select clearable v-model="selectStore"
+                   @change="chooseStore"
+                   placeholder="请选择" style="width: 10vw" size="small">
+          <el-option v-for="item in storeList" :key="item.id"
+                     :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-col>
       <el-col :span="6">
@@ -23,6 +26,7 @@
           range-separator="~"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          value-format="yyyy-MM-dd"
           style="width:17vw"
           size="small">
         </el-date-picker>
@@ -188,6 +192,11 @@
         })
       },
 
+      // 切换门店
+      chooseStore(){
+        this.getData()
+      },
+
       // 获取门店列表
       getStoreList() {
         this.$get('/store/list', {
@@ -206,6 +215,9 @@
         }
         if (e === 'thisMonth') {
           this.getData(this.searchDate.thisMonth[0], this.searchDate.thisMonth[1])
+        }
+        if (e === 'search') {
+          this.getData(this.datePickerValue[0], this.datePickerValue[1])
         }
         this.visible = e === 'search' ? true : false
         this.num = e === 'search' ? 0 : 12

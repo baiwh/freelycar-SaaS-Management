@@ -6,7 +6,7 @@ import router from './router/index'
 import axios from 'axios'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-import {get, post} from "./components/axiosHttp";
+import {get, post, getExcel, postExcel} from "./components/axiosHttp";
 import addNewButton from './components/addNewButton'
 import pagingDevice from './components/pagingDevice'
 import Vuex from 'vuex'
@@ -30,6 +30,8 @@ Vue.prototype.axios = axios
 // 引入两个封装接口
 Vue.prototype.$get = get
 Vue.prototype.$post = post
+Vue.prototype.$getExcel = getExcel
+Vue.prototype.$postExcel = postExcel
 
 Vue.config.productionTip = false
 
