@@ -77,6 +77,13 @@
               </template>
             </el-menu-item>
 
+            <el-menu-item index="/cooperation">
+              <template slot="title">
+                <i class="el-icon-star-on"></i>
+                <span>合作意向</span>
+              </template>
+            </el-menu-item>
+
           </el-menu>
         </el-aside>
 
