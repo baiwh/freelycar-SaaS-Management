@@ -6,7 +6,7 @@
         <el-input v-model="arkSn" size="small" style="width: 16vw"></el-input>
       </el-col>
       <el-col :span="8">所属门店：
-        <el-select v-model="storeId" placeholder="请选择" style="width: 16vw" size="small">
+        <el-select v-model="storeId" clearable placeholder="请选择" style="width: 16vw" size="small">
           <el-option v-for="item in storeList" :key="item.id" :label="item.name"
                      :value="item.id"></el-option>
         </el-select>
@@ -57,47 +57,33 @@
 
     <!--新增、修改智能柜弹框-->
     <el-dialog :title="newOrChange" :visible.sync="isShow">
-      <el-row>
-        <el-col :span="4" :offset="2">智能柜序号：</el-col>
-        <el-col :span="18">
+      <el-form :model="arkForm" :rules="rules" ref="arkForm" label-width="150px" class="demo-ruleForm">
+        <el-form-item label="智能柜序号：" prop="sn">
           <el-input v-model="arkForm.sn" style="width: 80%" size="small"></el-input>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="4" :offset="2">所属门店：</el-col>
-        <el-col :span="18">
+        </el-form-item>
+        <el-form-item label="所属门店：" prop="storeId">
           <el-select v-model="arkForm.storeId" placeholder="请选择" style="width: 27vw" size="small">
             <el-option v-for="item in storeList" :key="item.id" :label="item.name"
                        :value="item.id"></el-option>
           </el-select>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="4" :offset="2">投放位置：</el-col>
-        <el-col :span="18">
+        </el-form-item>
+        <el-form-item label="投放位置：" prop="location">
           <el-input v-model="arkForm.location" style="width: 80%" size="small"></el-input>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="4" :offset="2">规格：</el-col>
-        <el-col :span="18">
+        </el-form-item>
+        <el-form-item label="规格：" prop="doorNum">
           <el-select v-model="arkForm.doorNum" placeholder="请选择" style="width: 27vw" size="small">
             <el-option v-for="item in doorNumList" :key="item.value" :label="item.label"
                        :value="item.value"></el-option>
           </el-select>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="4" :offset="2">备注：</el-col>
-        <el-col :span="18">
+        </el-form-item>
+        <el-form-item label="备注：" prop="remark">
           <el-input v-model="arkForm.remark" style="width: 80%" size="small"></el-input>
-        </el-col>
-      </el-row>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="isShow = false">取 消</el-button>
-        <el-button type="primary" @click="submitArk">确 定</el-button>
-      </div>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="isShow = false">取 消</el-button>
+          <el-button type="primary" @click="submitArk('arkForm')">确 定</el-button>
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -109,6 +95,20 @@
       return {
         loading: true,
         arkSn: '',
+        rules:{
+          sn: [
+            { required: true, message: '请输入柜子编号', trigger: 'blur' },
+          ],
+          storeId: [
+            { required: true, message: '请选择门店', trigger: 'change' }
+          ],
+          location: [
+            { required: true, message: '请输入位置', trigger: 'blur' }
+          ],
+          doorNum: [
+            { required: true, message: '请选择规格', trigger: 'change' }
+          ]
+        },
         storeId: '',
         storeList: [],
         cabinetList: [],
@@ -128,10 +128,10 @@
           remark: '',
           name: ''
         },
-        doorNumList:[
+        doorNumList: [
           {
-            value:16,
-            label:16
+            value: 16,
+            label: 16
           }
         ]
       }
@@ -192,7 +192,7 @@
       // 删除单个
       handleDelete(row) {
         this.$get('/ark/delete', {
-          arkId:row.id
+          arkId: row.id
         }).then(res => {
           this.$message({
             message: '删除成功',
@@ -203,40 +203,48 @@
       },
 
       // 新增、修改提交
-      submitArk(){
-        this.isShow = false
-        if(this.newOrChange === '新增智能柜'){
-          this.$post('/ark/add',{
-            sn:this.arkForm.sn,
-            storeId:this.arkForm.storeId,
-            location:this.arkForm.location,
-            doorNum:this.arkForm.doorNum,
-            remark:this.arkForm.remark,
-            name:this.arkForm.name
-          }).then(res=>{
-            this.$message({
-              message: '提交成功',
-              type: 'success'
-            })
-            this.getList()
-          })
-        }else {
-          this.$post('/ark/modify',{
-            id: this.arkForm.id,
-            sn:this.arkForm.sn,
-            storeId:this.arkForm.storeId,
-            location:this.arkForm.location,
-            doorNum:this.arkForm.doorNum,
-            remark:this.arkForm.remark,
-            name:this.arkForm.name
-          }).then(res=>{
-            this.$message({
-              message: '提交成功',
-              type: 'success'
-            })
-            this.getList()
-          })
-        }
+      submitArk(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.isShow = false
+            if (this.newOrChange === '新增智能柜') {
+              this.$post('/ark/add', {
+                sn: this.arkForm.sn,
+                storeId: this.arkForm.storeId,
+                location: this.arkForm.location,
+                doorNum: this.arkForm.doorNum,
+                remark: this.arkForm.remark,
+                name: this.arkForm.name
+              }).then(res => {
+                this.$message({
+                  message: '提交成功',
+                  type: 'success'
+                })
+                this.getList()
+              })
+            } else {
+              this.$post('/ark/modify', {
+                id: this.arkForm.id,
+                sn: this.arkForm.sn,
+                storeId: this.arkForm.storeId,
+                location: this.arkForm.location,
+                doorNum: this.arkForm.doorNum,
+                remark: this.arkForm.remark,
+                name: this.arkForm.name
+              }).then(res => {
+                this.$message({
+                  message: '提交成功',
+                  type: 'success'
+                })
+                this.getList()
+              })
+            }
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        })
+
       },
 
       // 删除全部
@@ -245,23 +253,30 @@
         this.multipleSelection.forEach(v => {
           ids.push(v.id)
         })
-        this.$post('/ark/batchDelete', {
-          ids: ids.join(',')
-        }).then(res => {
-          if(res.length>9){
-            this.$notify({
-              title: '提示',
-              message: res,
-              duration: 0
-            })
-          }else {
-            this.$message({
-              message: '删除成功',
-              type: 'success'
-            })
-          }
-          this.getList()
-        })
+        if (this.multipleSelection.length > 1) {
+          this.$post('/ark/batchDelete', {
+            ids: ids.join(',')
+          }).then(res => {
+            if (res.length > 9) {
+              this.$notify({
+                title: '提示',
+                message: res,
+                duration: 0
+              })
+            } else {
+              this.$message({
+                message: '删除成功',
+                type: 'success'
+              })
+            }
+            this.getList()
+          })
+        } else {
+          this.$message({
+            message: '请勾选智能柜',
+            type: 'error'
+          })
+        }
       },
 
       // 门店过滤器

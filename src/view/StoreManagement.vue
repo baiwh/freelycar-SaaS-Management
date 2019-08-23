@@ -33,7 +33,7 @@
       <el-table-column label="删除" width="75">
         <template slot-scope="scope">
           <el-popover placement="top" width="160" :ref="scope.$index">
-            <p>确定删除本条抵用券？</p>
+            <p>确定删除此门店？</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="handleClose(scope.$index)">取消</el-button>
               <el-button type="primary" size="mini" @click="handleDelete(scope.row)">确定</el-button>
@@ -227,15 +227,22 @@
         this.multipleSelection.forEach(v => {
           ids.push(v.id)
         })
-        this.$post('/store/batchDelete',{
-          ids:ids.join(',')
-        }).then(res=>{
-          this.$message({
-            message: '删除成功',
-            type: 'success'
+        if(this.multipleSelection.length>1){
+          this.$post('/store/batchDelete',{
+            ids:ids.join(',')
+          }).then(res=>{
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            this.getList()
           })
-          this.getList()
-        })
+        } else {
+          this.$message({
+            message: '请勾选门店',
+            type: 'error'
+          })
+        }
       },
 
       // 多选功能
