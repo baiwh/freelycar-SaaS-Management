@@ -70,7 +70,7 @@
           <el-input v-model="accountInfo.password" style="width: 80%" size="small"></el-input>
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="accountInfo.phone" style="width: 80%" size="small"></el-input>
+          <el-input type="number" v-model.number="accountInfo.phone" style="width: 80%" size="small"></el-input>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="accountInfo.remark"
@@ -130,7 +130,7 @@
             { required: true, message: '请输入密码', trigger: 'blur' }
           ],
           phone: [
-            { type: 'number', required: true, message: '请输入手机号', trigger: 'blur' }
+            { required: true, message: '请输入手机号', trigger: 'blur' }
           ],
         },
         storeList: [],
@@ -255,7 +255,7 @@
         this.multipleSelection.filter(v => {
           ids.push(v.id)
         })
-        if (this.multipleSelection.length > 1) {
+        if (this.multipleSelection.length > 0) {
           this.$post('/sysUser/batchDelete', {
             ids: ids.join(',')
           }).then(res => {

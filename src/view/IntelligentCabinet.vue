@@ -253,7 +253,7 @@
         this.multipleSelection.forEach(v => {
           ids.push(v.id)
         })
-        if (this.multipleSelection.length > 1) {
+        if (this.multipleSelection.length > 0) {
           this.$post('/ark/batchDelete', {
             ids: ids.join(',')
           }).then(res => {

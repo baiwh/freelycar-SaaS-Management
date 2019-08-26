@@ -125,7 +125,8 @@
         searchDate: {
           today: '',
           thisMonth: [],
-        }
+        },
+        timeState:''
       }
     },
     methods: {
@@ -194,7 +195,15 @@
 
       // 切换门店
       chooseStore(){
-        this.getData()
+        if (this.timeState === 'today') {
+          this.getData(this.searchDate.today, this.searchDate.today)
+        }
+        if (this.timeState === 'thisMonth') {
+          this.getData(this.searchDate.thisMonth[0], this.searchDate.thisMonth[1])
+        }
+        if (this.timeState === 'search') {
+          this.getData(this.datePickerValue[0], this.datePickerValue[1])
+        }
       },
 
       // 获取门店列表
@@ -210,6 +219,8 @@
 
       // 按钮区间
       onButtonChange(e) {
+        this.timeState=e
+        console.log(this.datePickerValue)
         if (e === 'today') {
           this.getData(this.searchDate.today, this.searchDate.today)
         }
@@ -217,7 +228,9 @@
           this.getData(this.searchDate.thisMonth[0], this.searchDate.thisMonth[1])
         }
         if (e === 'search') {
-          this.getData(this.datePickerValue[0], this.datePickerValue[1])
+          if(this.datePickerValue){
+            this.getData(this.datePickerValue[0], this.datePickerValue[1])
+          }
         }
         this.visible = e === 'search' ? true : false
         this.num = e === 'search' ? 0 : 12
