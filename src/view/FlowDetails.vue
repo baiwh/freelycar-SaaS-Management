@@ -4,13 +4,18 @@
     <el-row :gutter="5">
       <el-col :span="6">
         <span>所属门店：</span>
-        <el-select clearable v-model="selectStore" placeholder="请选择" style="width: 10vw" size="small">
+        <el-select clearable v-model="selectStore"
+                   @change="getData"
+                   placeholder="请选择" style="width: 10vw" size="small">
           <el-option v-for="item in storeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-col>
       <el-col :span="12">
         <span>选择查找日期:</span>
-        <el-date-picker v-model="datePickerValue" type="daterange" size="small" range-separator="~"
+        <el-date-picker v-model="datePickerValue"
+                        type="daterange" size="small"
+                        range-separator="~"
+                        value-format="yyyy-MM-dd"
           start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-col>
       <el-col :span="2">
@@ -47,28 +52,28 @@
     <!--单据详情弹框-->
     <el-dialog title="单据详情" :visible.sync="dialogTableVisible">
       <el-row>
-        <el-col :span="12">车型：{{flowDetail}}</el-col>
-        <el-col :span="12">车牌号码：{{flowDetail}}</el-col>
+        <el-col :span="12">车型：{{flowDetail.carBrand}}</el-col>
+        <el-col :span="12">车牌号码：{{flowDetail.licensePlate}}</el-col>
       </el-row>
       <el-row>
-        <el-col :span="12">车主姓名：{{flowDetail}}</el-col>
-        <el-col :span="12">联系方式：{{flowDetail}}</el-col>
+        <el-col :span="12">车主姓名：{{flowDetail.clientName}}</el-col>
+        <el-col :span="12">联系方式：{{flowDetail.phone}}</el-col>
       </el-row>
       <el-row>
-        <el-col :span="12">消费项目：{{flowDetail}}</el-col>
-        <el-col :span="12">时间：{{flowDetail}}</el-col>
+        <el-col :span="12">消费项目：{{flowDetail.projectName}}</el-col>
+        <el-col :span="12">时间：{{flowDetail.serviceTime}}</el-col>
       </el-row>
       <el-row>
-        <el-col :span="12">消费门店：{{flowDetail}}</el-col>
-        <el-col :span="12">是否会员：{{flowDetail}}</el-col>
+        <el-col :span="12">消费门店：{{flowDetail.storeName}}</el-col>
+        <el-col :span="12">是否会员：{{flowDetail.isMember}}</el-col>
       </el-row>
       <el-row>
-        <el-col :span="12">会员卡余额：{{flowDetail}}</el-col>
-        <el-col :span="12">订单金额：{{flowDetail}}</el-col>
+        <el-col :span="12">支付金额：{{flowDetail.cost}}</el-col>
+        <!--<el-col :span="12">会员卡余额：{{flowDetail.blance}}</el-col>-->
+        <el-col :span="12">订单金额：{{flowDetail.orderCost}}</el-col>
       </el-row>
       <el-row>
-        <el-col :span="12">支付金额：{{flowDetail}}</el-col>
-        <el-col :span="12">支付方式：{{flowDetail}}</el-col>
+        <el-col :span="12">支付方式：{{flowDetail.payMethod}}</el-col>
       </el-row>
     </el-dialog>
   </div>
@@ -90,7 +95,7 @@
           pageSize: 10,
           pageTotal: 100
         },
-        flowDetail:'hehe',
+        flowDetail:{},
         dialogTableVisible:false
       }
     },
@@ -98,8 +103,8 @@
       // 获取单据列表
       getData() {
         this.$get('/order/listOrderParticulars', {
-          currentPage: this.pageData.currentPage,
-          pageSize: this.pageData.pageSize,
+          currentPage: this.pageData.currentPage?this.pageData.currentPage:1,
+          pageSize: this.pageData.pageSize?this.pageData.pageSize:10,
           storeId: this.selectStore,
           startTime: this.datePickerValue ? this.datePickerValue[0] : '',
           endTime: this.datePickerValue ? this.datePickerValue[1] : ''
@@ -107,15 +112,18 @@
           this.loading = false
           this.sumAmounts = res.totalAccount
           this.flowDetailsTable = res.pageResult.data
-          this.pageData.currentPage = res.currentPage
-          this.pageData.pageSize = res.pageSize
-          this.pageData.pageTotal = res.total
+          this.pageData.currentPage = res.pageResult.currentPage
+          this.pageData.pageSize = res.pageResult.pageSize
+          this.pageData.pageTotal = res.pageResult.total
+          console.log(this.pageData)
         })
       },
 
       // 查看单据详情
       thisFlowDetail(row){
         console.log(row)
+        this.flowDetail = row
+        console.log(this.flowDetail)
         this.dialogTableVisible=true
       },
 
@@ -133,9 +141,7 @@
       // 下载Excel
       getExcel() {
         this.$getExcel('/order/exportOrderParticularsExcel', {
-          currentPage: this.pageData.currentPage,
-          pageSize: this.pageData.pageSize,
-          storeId: localStorage.getItem('storeId'),
+          storeId: this.selectStore,
           startTime: this.datePickerValue ? this.datePickerValue[0] : '',
           endTime: this.datePickerValue ? this.datePickerValue[1] : ''
         })

@@ -33,7 +33,7 @@
       <el-table-column label="删除" width="75">
         <template slot-scope="scope">
           <el-popover placement="top" width="160" :ref="scope.$index">
-            <p>确定删除本条抵用券？</p>
+            <p>确定删除此门店？</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="handleClose(scope.$index)">取消</el-button>
               <el-button type="primary" size="mini" @click="handleDelete(scope.row)">确定</el-button>
@@ -80,42 +80,28 @@
 
     <!--新增、修改门店弹框-->
     <el-dialog :title="newOrChange" :visible.sync="isShow">
-      <el-row>
-        <el-col :span="4" :offset="2">门店名称：</el-col>
-        <el-col :span="18">
+      <el-form :model="storeInfo" :rules="rules" ref="storeInfo" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="门店名称：" prop="name">
           <el-input v-model="storeInfo.name" style="width: 80%" size="small"></el-input>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="4" :offset="2">门店地址：</el-col>
-        <el-col :span="18">
+        </el-form-item>
+        <el-form-item label="门店地址：" prop="address">
           <el-input v-model="storeInfo.address" style="width: 80%" size="small"></el-input>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="4" :offset="2">联系人：</el-col>
-        <el-col :span="18">
+        </el-form-item>
+        <el-form-item label="联系人：" prop="linkman">
           <el-input v-model="storeInfo.linkman" style="width: 80%" size="small"></el-input>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="4" :offset="2">电话：</el-col>
-        <el-col :span="18">
-          <el-input v-model="storeInfo.phone" style="width: 80%" size="small"></el-input>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="4" :offset="2">备注：</el-col>
-        <el-col :span="18">
+        </el-form-item>
+        <el-form-item label="电话：" prop="phone">
+          <el-input type="number" v-model.number="storeInfo.phone" style="width: 80%" size="small"></el-input>
+        </el-form-item>
+        <el-form-item label="备注：" prop="remark">
           <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="storeInfo.remark"
                     style="width:80%"></el-input>
-        </el-col>
-      </el-row>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="isShow = false">取 消</el-button>
-        <el-button type="primary" @click="storeSubmit">确 定</el-button>
-      </div>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="isShow = false">取 消</el-button>
+          <el-button type="primary" @click="storeSubmit('storeInfo')">确 定</el-button>
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -128,6 +114,20 @@
         loading: '',
         storeName: '',
         storeList: [],
+        rules:{
+          name: [
+            { required: true, message: '请输入名称', trigger: 'change' }
+          ],
+          address: [
+            { required: true, message: '请输入地址', trigger: 'blur' }
+          ],
+          linkman: [
+            { required: true, message: '请输入联系人', trigger: 'blur' }
+          ],
+          phone: [
+            { required: true, message: '请输入电话', trigger: 'blur' }
+          ]
+        },
         pageData: {
           currentPage: 1,
           pageSize: 10,
@@ -185,22 +185,30 @@
       },
 
       // 提交新增、修改
-      storeSubmit(){
-        this.isShow = false
-        this.$post('/store/modify',{
-          id: this.storeInfo.id,
-          name: this.storeInfo.name,
-          address: this.storeInfo.address,
-          linkman: this.storeInfo.linkman,
-          phone: this.storeInfo.phone,
-          remark: this.storeInfo.remark
-        }).then(res=>{
-          this.$message({
-            message: '提交成功',
-            type: 'success'
-          })
-          this.getList()
+      storeSubmit(formName){
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.isShow = false
+            this.$post('/store/modify',{
+              id: this.storeInfo.id,
+              name: this.storeInfo.name,
+              address: this.storeInfo.address,
+              linkman: this.storeInfo.linkman,
+              phone: this.storeInfo.phone,
+              remark: this.storeInfo.remark
+            }).then(res=>{
+              this.$message({
+                message: '提交成功',
+                type: 'success'
+              })
+              this.getList()
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
         })
+
       },
 
       // 关闭提示小窗口
@@ -227,15 +235,22 @@
         this.multipleSelection.forEach(v => {
           ids.push(v.id)
         })
-        this.$post('/store/batchDelete',{
-          ids:ids.join(',')
-        }).then(res=>{
-          this.$message({
-            message: '删除成功',
-            type: 'success'
+        if(this.multipleSelection.length>0){
+          this.$post('/store/batchDelete',{
+            ids:ids.join(',')
+          }).then(res=>{
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            this.getList()
           })
-          this.getList()
-        })
+        } else {
+          this.$message({
+            message: '请勾选门店',
+            type: 'error'
+          })
+        }
       },
 
       // 多选功能

@@ -10,6 +10,7 @@ import StatisticalReportForms from '@/router/StatisticalReportForms'
 import StoreManagement from '@/view/StoreManagement'
 // 账号管理
 import AccountManagement from '@/view/AccountManagement'
+import cooperation from '@/view/cooperation'
 
 // 统计报表
 import IncomeInquiry from '@/view/IncomeInquiry'
@@ -44,6 +45,10 @@ export default new Router({
           path: 'StoreManagement',
           name: '门店管理',
           component: StoreManagement
+        },{
+          path: 'cooperation',
+          name: '门店管理',
+          component: cooperation
         },
         {
           path: 'AccountManagement',
