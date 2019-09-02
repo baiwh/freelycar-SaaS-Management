@@ -8,8 +8,8 @@
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
     "build": "node build/build.js",
-    "deploy:dev": "npm run build && NODE_ENV=dev node ./deploy",
-    "deploy:prod": "npm run build && NODE_ENV=prod node ./deploy"
+    "deploy:dev": "npm run build && cross-env NODE_ENV=dev node ./deploy",
+    "deploy:prod": "npm run build && cross-env NODE_ENV=prod node ./deploy"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -34,6 +34,7 @@
     "chalk": "^2.0.1",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.0",
+    "cross-env": "^5.2.1",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^1.1.4",
     "friendly-errors-webpack-plugin": "^1.6.1",
