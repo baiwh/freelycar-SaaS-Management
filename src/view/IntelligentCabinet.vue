@@ -40,14 +40,14 @@
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleModify(scope.row)">修改</el-button>
-          <el-popover placement="top" width="160" :ref="scope.$index">
+          <el-popover placement="top" width="160" :ref="scope.row.id">
             <p>确定删除此智能柜？</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="handleClose(scope.$index)">取消</el-button>
+              <el-button size="mini" type="text" @click="handleClose(scope.row.id)">取消</el-button>
               <el-button type="primary" size="mini" @click="handleDelete(scope.row)">确定</el-button>
             </div>
           </el-popover>
-          <el-button size="mini" v-popover="scope.$index" type="danger">删除</el-button>
+          <el-button size="mini" v-popover="scope.row.id" type="danger">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -182,7 +182,7 @@
       handleModify(row) {
         this.isShow = true;
         this.newOrChange = '修改智能柜'
-        this.arkForm = row
+        this.arkForm = {...row}
       },
 
       handleClose(id) {

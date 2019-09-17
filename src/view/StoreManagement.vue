@@ -30,29 +30,29 @@
       <el-table-column prop="linkman" label="联系人"></el-table-column>
       <el-table-column prop="phone" label="电话"></el-table-column>
       <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
-      <el-table-column label="删除" width="75">
+      <el-table-column label="删除" width="85">
         <template slot-scope="scope">
-          <el-popover placement="top" width="160" :ref="scope.$index">
+          <el-popover placement="top" width="160" :ref="scope.row.id">
             <p>确定删除此门店？</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="handleClose(scope.$index)">取消</el-button>
+              <el-button size="mini" type="text" @click="handleClose(scope.row.id)">取消</el-button>
               <el-button type="primary" size="mini" @click="handleDelete(scope.row)">确定</el-button>
             </div>
           </el-popover>
-          <el-button size="mini" v-popover="scope.$index" type="danger">删除</el-button>
+          <el-button size="mini" v-popover="scope.row.id" type="danger">删除</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="修改" width="75">
+      <el-table-column label="修改" width="85">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleModify(scope.row)">修改</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="上移" width="75">
+      <el-table-column label="上移" width="85">
         <template slot-scope="scope">
           <el-button size="mini" type="primary">上移</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="下移" width="75">
+      <el-table-column label="下移" width="85">
         <template slot-scope="scope">
           <el-button size="mini" type="primary">下移</el-button>
         </template>
@@ -181,7 +181,7 @@
       handleModify(row) {
         this.isShow = true;
         this.newOrChange = "修改门店"
-        this.storeInfo = row
+        this.storeInfo = {...row}
       },
 
       // 提交新增、修改

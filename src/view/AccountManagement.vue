@@ -37,14 +37,14 @@
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="permissionSettings">权限设置</el-button>
           <el-button size="mini" type="primary" @click="handleModify(scope.row)">修改</el-button>
-          <el-popover placement="top" width="160" :ref="scope.$index">
+          <el-popover placement="top" width="160" :ref="scope.row.id">
             <p>确定删除此账号？</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="handleClose(scope.$index)">取消</el-button>
+              <el-button size="mini" type="text" @click="handleClose(scope.row.id)">取消</el-button>
               <el-button type="primary" size="mini" @click="handleDelete(scope.row)">确定</el-button>
             </div>
           </el-popover>
-          <el-button size="mini" v-popover="scope.$index" type="danger">删除</el-button>
+          <el-button size="mini" v-popover="scope.row.id" type="danger">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -204,7 +204,7 @@
       handleModify(row) {
         this.newOrChange = '修改账户'
         this.isShow = true
-        this.accountInfo = row
+        this.accountInfo = {...row}
         this.accountInfo.password = ''
       },
 
@@ -289,7 +289,6 @@
 
       // 门店过滤器
       storeFormat(row) {
-        console.log(row)
         let name = ''
         this.storeList.map(value => {
           if (value.id == row.storeId) {

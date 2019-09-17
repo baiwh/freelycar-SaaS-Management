@@ -126,7 +126,7 @@
           today: '',
           thisMonth: [],
         },
-        timeState:''
+        timeState:'today'
       }
     },
     methods: {
