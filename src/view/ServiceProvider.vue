@@ -168,7 +168,6 @@
           address: this.serviceProviderInfo.address
         }).then(res => {
           console.log(res)
-          this.serviceProviderInfo.address=res.formatted_address
           this.serviceProviderInfo.addressLng=res.location.lng
           this.serviceProviderInfo.addressLat=res.location.lat
         })
