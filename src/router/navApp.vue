@@ -43,6 +43,13 @@
               </template>
             </el-menu-item>
 
+            <el-menu-item index="/ServiceProvider">
+              <template slot="title">
+                <i class="el-icon-star-on"></i>
+                <span>服务商管理</span>
+              </template>
+            </el-menu-item>
+
             <el-menu-item index="/AccountManagement">
               <template slot="title">
                 <i class="el-icon-star-on"></i>
