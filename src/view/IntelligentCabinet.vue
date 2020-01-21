@@ -34,7 +34,7 @@
       <el-table-column prop="sn" label="智能柜序号"></el-table-column>
       <el-table-column prop="storeId" label="所属门店" :formatter="storeFormat"></el-table-column>
       <el-table-column prop="location" label="投放位置"></el-table-column>
-      <el-table-column prop="location" label="规格"></el-table-column>
+      <el-table-column prop="doorNum" label="规格"></el-table-column>
       <el-table-column prop="createTime" label="创建时间"></el-table-column>
       <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="150">
@@ -129,6 +129,10 @@
           name: ''
         },
         doorNumList: [
+          {
+            value: 8,
+            label: 8
+          },
           {
             value: 16,
             label: 16
