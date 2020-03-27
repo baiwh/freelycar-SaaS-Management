@@ -120,12 +120,6 @@
           ],
           address: [
             { required: true, message: '请输入地址', trigger: 'blur' }
-          ],
-          linkman: [
-            { required: true, message: '请输入联系人', trigger: 'blur' }
-          ],
-          phone: [
-            { required: true, message: '请输入电话', trigger: 'blur' }
           ]
         },
         pageData: {
