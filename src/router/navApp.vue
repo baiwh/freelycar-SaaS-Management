@@ -77,12 +77,12 @@
               </template>
             </el-menu-item>
 
-            <el-menu-item index="/ActivityPropaganda">
+            <!-- <el-menu-item index="/ActivityPropaganda">
               <template slot="title">
                 <i class="el-icon-star-on"></i>
                 <span>活动宣传管理</span>
               </template>
-            </el-menu-item>
+            </el-menu-item> -->
 
             <el-menu-item index="/cooperation">
               <template slot="title">
