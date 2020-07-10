@@ -211,7 +211,7 @@
         this.$get('/store/list', {
           name: '',
           currentPage: 1,
-          pageSize: 100
+          pageSize: 200
         }).then(res => {
           this.storeList = res.data
         })
