@@ -22,7 +22,7 @@
 
     <!--表格-->
     <el-table ref="multipleTable" :data="storeList" tooltip-effect="dark" border
-              @selection-change="handleSelectionChange" v-loading="loading">
+              @selection-change="handleSelectionChange" v-loading="loading"  :default-sort="{prop: 'sort', order: 'ascending'}">
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="序号" type="index"></el-table-column>
       <el-table-column prop="name" label="门店名称" show-overflow-tooltip></el-table-column>
@@ -30,7 +30,7 @@
       <el-table-column prop="linkman" label="联系人"></el-table-column>
       <el-table-column prop="phone" label="电话"></el-table-column>
       <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
-      <el-table-column label="删除" width="85">
+      <el-table-column align="center" label="删除" width="85">
         <template slot-scope="scope">
           <el-popover placement="top" width="160" :ref="scope.row.id">
             <p>确定删除此门店？</p>
@@ -42,19 +42,15 @@
           <el-button size="mini" v-popover="scope.row.id" type="danger">删除</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="修改" width="85">
+      <el-table-column align="center" label="修改" width="85">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleModify(scope.row)">修改</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="上移" width="85">
+      <el-table-column align="center" label="排序" width="170">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary">上移</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column label="下移" width="85">
-        <template slot-scope="scope">
-          <el-button size="mini" type="primary">下移</el-button>
+          <el-button  :disabled="scope.$index===0" size="mini" type="primary" @click="upLayer(scope.$index,scope.row)" >上移</el-button>
+          <el-button :disabled="scope.$index===(storeList.length-1)" size="mini" type="primary" @click.native.prevent="downLayer(scope.$index,scope.row)">下移</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -65,7 +61,7 @@
     </el-row>
 
     <!--默认列表按钮-->
-    <el-row>
+    <!-- <el-row>
       <el-col :span="4">
         <el-popover placement="bottom" width="200" v-model="show">
           <p>发布新列表并覆盖列表？</p>
@@ -76,7 +72,7 @@
           <el-button size="small" type="primary" slot="reference" plain>发布默认列表</el-button>
         </el-popover>
       </el-col>
-    </el-row>
+    </el-row> -->
 
     <!--新增、修改门店弹框-->
     <el-dialog :title="newOrChange" :visible.sync="isShow">
@@ -149,6 +145,7 @@
           currentPage: this.pageData.currentPage,
           pageSize: this.pageData.pageSize
         }).then(res => {
+          // console.log(res);
           this.loading = false
           this.storeList = res.data
           this.pageData.currentPage = res.currentPage
@@ -253,13 +250,49 @@
       },
 
       // 上移
+      upLayer(index, row) {
+        if (index == 0) {
+          this.$message({
+            message: '处于顶端，不能继续上移',
+            type: 'warning'
+          });
+        } else {
+          let param = {
+          };
+          param[row.id] = this.storeList[index - 1].sort//该行的门店id和sort
+          param[this.storeList[index - 1].id]=row.sort;//上一行数据的sort
+           //访问后台接口传入两个调换的门店id和sort值有后台调换顺序，刷新数据
+          this.switchLocation(param);
+        }
+      },
       // 下移
-
-      // 发布列表
-      newListSubmit(){
-        this.show = false
-        // this.$post()
+      downLayer(index, row) {
+        if (index == this.storeList.length-1) {
+          this.$message({
+            message: '处于底端，不能继续下移',
+            type: 'warning'
+          });
+        } else {
+          let param = {
+          };
+          param[row.id] = this.storeList[index + 1].sort//该行的门店id和sort
+          param[this.storeList[index + 1].id]=row.sort;//上一行数据的sort
+          this.switchLocation(param);
+        }
+      },
+      //移动请求
+      switchLocation(param){
+        this.$post('/store/switchLocation', 
+             param
+           ).then(res=> {
+            this.$message({
+              message: '移动成功',
+              type: 'success'
+            });
+            this.getList();
+          });
       }
+
     },
     mounted: function () {
       this.getList()

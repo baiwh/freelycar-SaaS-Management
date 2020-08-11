@@ -14,6 +14,7 @@ module.exports = {
       '/api': {
         // target: 'http://www.pwai.net.cn/SaaS',
         target: 'https://www.freelycar.com',
+        // target: 'http://192.168.0.168', 
         secure: false,
         changeOrigin: true,
         withCredentials: false,

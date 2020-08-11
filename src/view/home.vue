@@ -32,8 +32,8 @@
     </el-row>
 
     <el-table v-loading="loading" :data="dataList">
-      <el-table-column property="cumulateUserCount"
-                       :label="dataList[0].yesterdayFlag?'昨日关注人数':'当日关注人数'" align="center"/>
+      <el-table-column property="cumulateUserCount" :label="newyesterdayFlag"
+                        align="center"/>
       <el-table-column property="registerUserCount" label="注册人数" align="center"/>
       <el-table-column property="orderCount" label="订单数" align="center"/>
     </el-table>
@@ -49,7 +49,8 @@
         storeList:[],
         datePickerValue:'',
         dataList:[],
-        loading:true
+        loading:true,
+        yesterdayFlag:false,
       }
     },
     methods:{
@@ -63,6 +64,7 @@
           this.loading=false
           let list = [res]
           this.dataList = list
+          this.yesterdayFlag=this.dataList[0].yesterdayFlag
         })
       },
 
@@ -76,6 +78,11 @@
           this.storeList = res.data
         })
       },
+    },
+    computed:{
+      newyesterdayFlag:function(){
+        return this.yesterdayFlag?'昨日关注人数':'当日关注人数';
+      }
     },
     mounted: function () {
       let date = new Date()
