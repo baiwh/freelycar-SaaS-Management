@@ -2,7 +2,8 @@
   <div>
     <!--查询条件-->
     <el-row>
-      <el-col :span="10">门店名称：
+      <el-col :span="10">
+        门店名称：
         <el-input v-model="storeName" size="small" style="width: 16vw"></el-input>
       </el-col>
       <el-col :span="3">
@@ -21,10 +22,21 @@
     </el-row>
 
     <!--表格-->
-    <el-table ref="multipleTable" :data="storeList" tooltip-effect="dark" border
-              @selection-change="handleSelectionChange" v-loading="loading"  :default-sort="{prop: 'sort', order: 'ascending'}">
+    <el-table
+      ref="multipleTable"
+      :data="storeList"
+      tooltip-effect="dark"
+      border
+      @selection-change="handleSelectionChange"
+      v-loading="loading"
+      :default-sort="{prop: 'sort', order: 'ascending'}"
+    >
       <el-table-column type="selection"></el-table-column>
-      <el-table-column label="序号" type="index"></el-table-column>
+      <el-table-column label="序号" type="index">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(pageData.currentPage - 1) * pageData.pageSize + 1}}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="name" label="门店名称" show-overflow-tooltip></el-table-column>
       <el-table-column prop="address" label="地址"></el-table-column>
       <el-table-column prop="linkman" label="联系人"></el-table-column>
@@ -49,8 +61,18 @@
       </el-table-column>
       <el-table-column align="center" label="排序" width="170">
         <template slot-scope="scope">
-          <el-button  :disabled="scope.$index===0" size="mini" type="primary" @click="upLayer(scope.$index,scope.row)" >上移</el-button>
-          <el-button :disabled="scope.$index===(storeList.length-1)" size="mini" type="primary" @click.native.prevent="downLayer(scope.$index,scope.row)">下移</el-button>
+          <el-button
+            :disabled="scope.$index===0"
+            size="mini"
+            type="primary"
+            @click="upLayer(scope.$index,scope.row)"
+          >上移</el-button>
+          <el-button
+            :disabled="scope.$index===(storeList.length-1)"
+            size="mini"
+            type="primary"
+            @click.native.prevent="downLayer(scope.$index,scope.row)"
+          >下移</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -72,11 +94,17 @@
           <el-button size="small" type="primary" slot="reference" plain>发布默认列表</el-button>
         </el-popover>
       </el-col>
-    </el-row> -->
+    </el-row>-->
 
     <!--新增、修改门店弹框-->
     <el-dialog :title="newOrChange" :visible.sync="isShow">
-      <el-form :model="storeInfo" :rules="rules" ref="storeInfo" label-width="100px" class="demo-ruleForm">
+      <el-form
+        :model="storeInfo"
+        :rules="rules"
+        ref="storeInfo"
+        label-width="100px"
+        class="demo-ruleForm"
+      >
         <el-form-item label="门店名称：" prop="name">
           <el-input v-model="storeInfo.name" style="width: 80%" size="small"></el-input>
         </el-form-item>
@@ -90,8 +118,13 @@
           <el-input type="number" v-model.number="storeInfo.phone" style="width: 80%" size="small"></el-input>
         </el-form-item>
         <el-form-item label="备注：" prop="remark">
-          <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="storeInfo.remark"
-                    style="width:80%"></el-input>
+          <el-input
+            type="textarea"
+            :rows="2"
+            placeholder="请输入内容"
+            v-model="storeInfo.remark"
+            style="width:80%"
+          ></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="isShow = false">取 消</el-button>
@@ -103,205 +136,195 @@
 </template>
 
 <script>
-  export default {
-    name: 'StoreManagement',
-    data() {
-      return {
-        loading: '',
-        storeName: '',
-        storeList: [],
-        rules:{
-          name: [
-            { required: true, message: '请输入名称', trigger: 'change' }
-          ],
-          address: [
-            { required: true, message: '请输入地址', trigger: 'blur' }
-          ]
-        },
-        pageData: {
-          currentPage: 1,
-          pageSize: 10,
-          pageTotal: 100
-        },
-        storeInfo: {
-          id: '',
-          name: '',
-          address: '',
-          linkman: '',
-          phone: '',
-          remark: ''
-        },
-        multipleSelection: [],
-        newOrChange: '',
-        isShow: false,
-        show: false
-      }
+export default {
+  name: "StoreManagement",
+  data() {
+    return {
+      loading: "",
+      storeName: "",
+      storeList: [],
+      rules: {
+        name: [{ required: true, message: "请输入名称", trigger: "change" }],
+        address: [{ required: true, message: "请输入地址", trigger: "blur" }],
+      },
+      pageData: {
+        currentPage: 1,
+        pageSize: 10,
+        pageTotal: 100,
+      },
+      storeInfo: {
+        id: "",
+        name: "",
+        address: "",
+        linkman: "",
+        phone: "",
+        remark: "",
+      },
+      multipleSelection: [],
+      newOrChange: "",
+      isShow: false,
+      show: false,
+    };
+  },
+  methods: {
+    // 获取门店列表
+    getList() {
+      this.$get("/store/list", {
+        name: this.storeName,
+        currentPage: this.pageData.currentPage,
+        pageSize: this.pageData.pageSize,
+      }).then((res) => {
+        // console.log(res);
+        this.loading = false;
+        this.storeList = res.data;
+        this.pageData.currentPage = res.currentPage;
+        this.pageData.pageSize = res.pageSize;
+        this.pageData.pageTotal = res.total;
+      });
     },
-    methods: {
-      // 获取门店列表
-      getList() {
-        this.$get('/store/list', {
-          name: this.storeName,
-          currentPage: this.pageData.currentPage,
-          pageSize: this.pageData.pageSize
-        }).then(res => {
-          // console.log(res);
-          this.loading = false
-          this.storeList = res.data
-          this.pageData.currentPage = res.currentPage
-          this.pageData.pageSize = res.pageSize
-          this.pageData.pageTotal = res.total
-        })
-      },
 
-      // 新增门店打开模态框
-      addNewStore() {
-        this.isShow = true
-        this.newOrChange = "新增门店"
-        this.storeInfo = {
-          id: '',
-          name: '',
-          address: '',
-          linkman: '',
-          phone: '',
-          remark: ''
-        }
-      },
+    // 新增门店打开模态框
+    addNewStore() {
+      this.isShow = true;
+      this.newOrChange = "新增门店";
+      this.storeInfo = {
+        id: "",
+        name: "",
+        address: "",
+        linkman: "",
+        phone: "",
+        remark: "",
+      };
+    },
 
-      // 修改门店模态框
-      handleModify(row) {
-        this.isShow = true;
-        this.newOrChange = "修改门店"
-        this.storeInfo = {...row}
-      },
+    // 修改门店模态框
+    handleModify(row) {
+      this.isShow = true;
+      this.newOrChange = "修改门店";
+      this.storeInfo = { ...row };
+    },
 
-      // 提交新增、修改
-      storeSubmit(formName){
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            this.isShow = false
-            this.$post('/store/modify',{
-              id: this.storeInfo.id,
-              name: this.storeInfo.name,
-              address: this.storeInfo.address,
-              linkman: this.storeInfo.linkman,
-              phone: this.storeInfo.phone,
-              remark: this.storeInfo.remark
-            }).then(res=>{
-              this.$message({
-                message: '提交成功',
-                type: 'success'
-              })
-              this.getList()
-            })
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        })
-
-      },
-
-      // 关闭提示小窗口
-      handleClose(id) {
-        this.$refs[id].doClose()
-      },
-
-      // 删除单个门店
-      handleDelete(row) {
-        this.$get('/store/delete',{
-          id:row.id
-        }).then(res=>{
-          this.$message({
-            message: '删除成功',
-            type: 'success'
-          })
-          this.getList()
-        })
-      },
-
-      // 批量删除门店
-      allDelete() {
-        let ids = []
-        this.multipleSelection.forEach(v => {
-          ids.push(v.id)
-        })
-        if(this.multipleSelection.length>0){
-          this.$post('/store/batchDelete',{
-            ids:ids.join(',')
-          }).then(res=>{
+    // 提交新增、修改
+    storeSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.isShow = false;
+          this.$post("/store/modify", {
+            id: this.storeInfo.id,
+            name: this.storeInfo.name,
+            address: this.storeInfo.address,
+            linkman: this.storeInfo.linkman,
+            phone: this.storeInfo.phone,
+            remark: this.storeInfo.remark,
+          }).then((res) => {
             this.$message({
-              message: '删除成功',
-              type: 'success'
-            })
-            this.getList()
-          })
-        } else {
-          this.$message({
-            message: '请勾选门店',
-            type: 'error'
-          })
-        }
-      },
-
-      // 多选功能
-      handleSelectionChange(val) {
-        this.multipleSelection = val
-      },
-
-      // 上移
-      upLayer(index, row) {
-        if (index == 0) {
-          this.$message({
-            message: '处于顶端，不能继续上移',
-            type: 'warning'
-          });
-        } else {
-          let param = {
-          };
-          param[row.id] = this.storeList[index - 1].sort//该行的门店id和sort
-          param[this.storeList[index - 1].id]=row.sort;//上一行数据的sort
-           //访问后台接口传入两个调换的门店id和sort值有后台调换顺序，刷新数据
-          this.switchLocation(param);
-        }
-      },
-      // 下移
-      downLayer(index, row) {
-        if (index == this.storeList.length-1) {
-          this.$message({
-            message: '处于底端，不能继续下移',
-            type: 'warning'
-          });
-        } else {
-          let param = {
-          };
-          param[row.id] = this.storeList[index + 1].sort//该行的门店id和sort
-          param[this.storeList[index + 1].id]=row.sort;//上一行数据的sort
-          this.switchLocation(param);
-        }
-      },
-      //移动请求
-      switchLocation(param){
-        this.$post('/store/switchLocation', 
-             param
-           ).then(res=> {
-            this.$message({
-              message: '移动成功',
-              type: 'success'
+              message: "提交成功",
+              type: "success",
             });
             this.getList();
           });
-      }
-
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
     },
-    mounted: function () {
-      this.getList()
-    }
-  }
+
+    // 关闭提示小窗口
+    handleClose(id) {
+      this.$refs[id].doClose();
+    },
+
+    // 删除单个门店
+    handleDelete(row) {
+      this.$get("/store/delete", {
+        id: row.id,
+      }).then((res) => {
+        this.$message({
+          message: "删除成功",
+          type: "success",
+        });
+        this.getList();
+      });
+    },
+
+    // 批量删除门店
+    allDelete() {
+      let ids = [];
+      this.multipleSelection.forEach((v) => {
+        ids.push(v.id);
+      });
+      if (this.multipleSelection.length > 0) {
+        this.$post("/store/batchDelete", {
+          ids: ids.join(","),
+        }).then((res) => {
+          this.$message({
+            message: "删除成功",
+            type: "success",
+          });
+          this.getList();
+        });
+      } else {
+        this.$message({
+          message: "请勾选门店",
+          type: "error",
+        });
+      }
+    },
+
+    // 多选功能
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+
+    // 上移
+    upLayer(index, row) {
+      if (index == 0) {
+        this.$message({
+          message: "处于顶端，不能继续上移",
+          type: "warning",
+        });
+      } else {
+        let param = {};
+        param[row.id] = this.storeList[index - 1].sort; //该行的门店id和sort
+        param[this.storeList[index - 1].id] = row.sort; //上一行数据的sort
+        //访问后台接口传入两个调换的门店id和sort值有后台调换顺序，刷新数据
+        this.switchLocation(param);
+      }
+    },
+    // 下移
+    downLayer(index, row) {
+      if (index == this.storeList.length - 1) {
+        this.$message({
+          message: "处于底端，不能继续下移",
+          type: "warning",
+        });
+      } else {
+        let param = {};
+        param[row.id] = this.storeList[index + 1].sort; //该行的门店id和下一行的ort
+        param[this.storeList[index + 1].id] = row.sort; //上一行数据的sort
+        this.switchLocation(param);
+      }
+    },
+    //移动请求
+    switchLocation(param) {
+      this.$post("/store/switchLocation", param).then((res) => {
+        this.$message({
+          message: "移动成功",
+          type: "success",
+        });
+        this.getList();
+      });
+    },
+  },
+  mounted: function () {
+    this.getList();
+  },
+};
 </script>
 
 <style lang="less" scoped>
-  .el-row {
-    margin-bottom: 30px;
-  }
+.el-row {
+  margin-bottom: 30px;
+}
 </style>
