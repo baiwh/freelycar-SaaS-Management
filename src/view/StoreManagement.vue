@@ -62,13 +62,13 @@
       <el-table-column align="center" label="排序" width="170">
         <template slot-scope="scope">
           <el-button
-            :disabled="scope.$index===0"
+            :disabled="scope.row.sort===10"
             size="mini"
             type="primary"
             @click="upLayer(scope.$index,scope.row)"
           >上移</el-button>
           <el-button
-            :disabled="scope.$index===(storeList.length-1)"
+           :disabled="scope.$index+(pageData.currentPage - 1) * pageData.pageSize + 1 === pageData.pageTotal"
             size="mini"
             type="primary"
             @click.native.prevent="downLayer(scope.$index,scope.row)"
@@ -279,11 +279,25 @@ export default {
 
     // 上移
     upLayer(index, row) {
-      if (index == 0) {
+      if (index == 0 && row.sort!== 10) {
+        let param = {};
+        let prestore;
+        this.$get("/store/list", {
+          name: this.storeName,
+          currentPage: this.pageData.currentPage-1,
+          pageSize: this.pageData.pageSize,
+      }).then((res) => {
+        // console.log(res)
+        prestore = res.data[9];
+        param[row.id] = prestore.sort;
+        param[prestore.id] = row.sort;
+        this.switchLocation(param);
+
+      });
+      }else if(row.sort === 10){
         this.$message({
           message: "处于顶端，不能继续上移",
-          type: "warning",
-        });
+          type: "warning",});
       } else {
         let param = {};
         param[row.id] = this.storeList[index - 1].sort; //该行的门店id和sort
@@ -294,14 +308,28 @@ export default {
     },
     // 下移
     downLayer(index, row) {
-      if (index == this.storeList.length - 1) {
+      //下移当前页最后一个逻辑
+      if (index === this.storeList.length - 1 && index+(this.pageData.currentPage - 1) * this.pageData.pageSize + 1 !==this.pageData.pageTotal) {
+        let param = {};
+        let nextstore;
+        this.$get("/store/list", {
+          name: this.storeName,
+          currentPage: this.pageData.currentPage+1,
+          pageSize: this.pageData.pageSize,
+      }).then((res) => {
+        nextstore = res.data[0];
+        param[row.id] = nextstore.sort;
+        param[nextstore.id] = row.sort;
+        this.switchLocation(param);
+
+      });
+      }else if(index+(this.pageData.currentPage - 1) * this.pageData.pageSize + 1 === this.pageData.pageTotal){
         this.$message({
-          message: "处于底端，不能继续下移",
-          type: "warning",
-        });
+          message: "最后一个元素，不能下移",
+          type: "warning",});
       } else {
         let param = {};
-        param[row.id] = this.storeList[index + 1].sort; //该行的门店id和下一行的ort
+        param[row.id] = this.storeList[index + 1].sort; //该行的门店id和下一行的sort
         param[this.storeList[index + 1].id] = row.sort; //上一行数据的sort
         this.switchLocation(param);
       }
