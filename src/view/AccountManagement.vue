@@ -3,7 +3,7 @@
     <!--查询条件-->
     <el-row :gutter="5">
       <el-col :span="9">
-        <span>所属门店：</span>
+        <span>所属网点：</span>
         <el-select clearable v-model="selectStore" placeholder="请选择" style="width: 16vw" size="small">
           <el-option v-for="item in storeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
@@ -28,7 +28,7 @@
               @selection-change="handleSelectionChange" v-loading="loading">
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="序号" type="index"></el-table-column>
-      <el-table-column prop="storeId" label="所属门店" :formatter="storeFormat"></el-table-column>
+      <el-table-column prop="storeId" label="所属网点" :formatter="storeFormat"></el-table-column>
       <el-table-column prop="staffName" label="账号使用者"></el-table-column>
       <el-table-column prop="username" label="用户名"></el-table-column>
       <el-table-column prop="phone" label="手机号"></el-table-column>
@@ -55,7 +55,7 @@
     <!--新增、修改账号-->
     <el-dialog :title="newOrChange" :visible.sync="isShow">
       <el-form :model="accountInfo" :rules="rules" ref="accountInfo" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="所属门店" prop="storeId">
+        <el-form-item label="所属网点" prop="storeId">
           <el-select v-model="accountInfo.storeId" placeholder="请选择" style="width: 80%">
             <el-option v-for="item in storeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
@@ -118,7 +118,7 @@
         selectStore: '',
         rules:{
           storeId: [
-            { required: true, message: '请选择门店', trigger: 'change' }
+            { required: true, message: '请选择网点', trigger: 'change' }
           ],
           staffName: [
             { required: true, message: '请输入使用者', trigger: 'blur' }
@@ -174,7 +174,7 @@
         })
       },
 
-      // 获取门店列表
+      // 获取网点列表
       getStoreList() {
         this.$get('/store/list', {
           name: '',
@@ -249,7 +249,7 @@
         })
       },
 
-      // 批量删除门店
+      // 批量删除网点
       allDelete() {
         let ids = []
         this.multipleSelection.filter(v => {
@@ -287,7 +287,7 @@
         this.$refs[id].doClose()
       },
 
-      // 门店过滤器
+      // 网点过滤器
       storeFormat(row) {
         let name = ''
         this.storeList.map(value => {

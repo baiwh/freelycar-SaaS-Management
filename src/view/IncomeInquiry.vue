@@ -3,7 +3,7 @@
     <!--选择区间-->
     <el-row :gutter="5">
       <el-col :span="7">
-        <span>所属门店：</span>
+        <span>所属网点：</span>
         <el-select clearable v-model="selectStore"
                    @change="chooseStore"
                    placeholder="请选择" style="width: 10vw" size="small">
@@ -193,7 +193,7 @@
         })
       },
 
-      // 切换门店
+      // 切换网点
       chooseStore(){
         if (this.timeState === 'today') {
           this.getData(this.searchDate.today, this.searchDate.today)
@@ -206,7 +206,7 @@
         }
       },
 
-      // 获取门店列表
+      // 获取网点列表
       getStoreList() {
         this.$get('/store/list', {
           name: '',

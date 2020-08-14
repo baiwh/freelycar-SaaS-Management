@@ -3,7 +3,7 @@
     <!--查询条件框-->
     <el-row :gutter="5">
       <el-col :span="6">
-        <span>所属门店：</span>
+        <span>所属网点：</span>
         <el-select clearable v-model="selectStore"
                    @change="getData"
                    placeholder="请选择" style="width: 10vw" size="small">
@@ -64,7 +64,7 @@
         <el-col :span="12">时间：{{flowDetail.serviceTime}}</el-col>
       </el-row>
       <el-row>
-        <el-col :span="12">消费门店：{{flowDetail.storeName}}</el-col>
+        <el-col :span="12">消费网点：{{flowDetail.storeName}}</el-col>
         <el-col :span="12">是否会员：{{flowDetail.isMember}}</el-col>
       </el-row>
       <el-row>
@@ -127,7 +127,7 @@
         this.dialogTableVisible=true
       },
 
-      // 获取门店列表
+      // 获取网点列表
       getStoreList() {
         this.$get('/store/list', {
           name: '',

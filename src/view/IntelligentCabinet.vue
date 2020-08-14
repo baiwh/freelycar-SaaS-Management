@@ -5,7 +5,7 @@
       <el-col :span="10">智能柜序号:
         <el-input v-model="arkSn" size="small" style="width: 16vw"></el-input>
       </el-col>
-      <el-col :span="8">所属门店：
+      <el-col :span="8">所属网点：
         <el-select v-model="storeId" clearable placeholder="请选择" style="width: 16vw" size="small">
           <el-option v-for="item in storeList" :key="item.id" :label="item.name"
                      :value="item.id"></el-option>
@@ -32,7 +32,7 @@
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="序号" type="index"></el-table-column>
       <el-table-column prop="sn" label="智能柜序号"></el-table-column>
-      <el-table-column prop="storeId" label="所属门店" :formatter="storeFormat"></el-table-column>
+      <el-table-column prop="storeId" label="所属网点" :formatter="storeFormat"></el-table-column>
       <el-table-column prop="location" label="投放位置"></el-table-column>
       <el-table-column prop="doorNum" label="规格"></el-table-column>
       <el-table-column prop="createTime" label="创建时间"></el-table-column>
@@ -61,7 +61,7 @@
         <el-form-item label="智能柜序号：" prop="sn">
           <el-input v-model="arkForm.sn" style="width: 80%" size="small"></el-input>
         </el-form-item>
-        <el-form-item label="所属门店：" prop="storeId">
+        <el-form-item label="所属网点：" prop="storeId">
           <el-select v-model="arkForm.storeId" placeholder="请选择" style="width: 27vw" size="small">
             <el-option v-for="item in storeList" :key="item.id" :label="item.name"
                        :value="item.id"></el-option>
@@ -100,7 +100,7 @@
             { required: true, message: '请输入柜子编号', trigger: 'blur' },
           ],
           storeId: [
-            { required: true, message: '请选择门店', trigger: 'change' }
+            { required: true, message: '请选择网点', trigger: 'change' }
           ],
           location: [
             { required: true, message: '请输入位置', trigger: 'blur' }
@@ -157,7 +157,7 @@
         })
       },
 
-      // 获取门店列表
+      // 获取网点列表
       getStoreList() {
         this.$get('/store/list', {
           name: this.storeName,
@@ -283,7 +283,7 @@
         }
       },
 
-      // 门店过滤器
+      // 网点过滤器
       storeFormat(row) {
         let name = ''
         this.storeList.map(value => {

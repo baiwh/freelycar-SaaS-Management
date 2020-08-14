@@ -39,7 +39,7 @@
             <el-menu-item index="/StoreManagement">
               <template slot="title">
                 <i class="el-icon-star-on"></i>
-                <span>门店管理</span>
+                <span>网点管理</span>
               </template>
             </el-menu-item>
 

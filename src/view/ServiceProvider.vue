@@ -53,7 +53,7 @@
       <pagingDevice :pageData.sync="pageData" @changePage="getList"></pagingDevice>
     </el-row>
 
-    <!--新增、修改门店弹框-->
+    <!--新增、修改网点弹框-->
     <el-dialog :title="newOrChange" :visible.sync="isShow">
       <el-form :model="serviceProviderInfo" :rules="rules" ref="serviceProviderInfo" label-width="150px" class="demo-ruleForm">
         <el-form-item label="服务商名称：" prop="name">
@@ -125,7 +125,7 @@
       }
     },
     methods: {
-      // 获取门店列表
+      // 获取网点列表
       getList() {
         this.$get('/serviceProvider/list', {
           name: this.serviceProviderName,

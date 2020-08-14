@@ -3,7 +3,7 @@
     <!--查询条件-->
     <el-row>
       <el-col :span="10">
-        门店名称：
+        网点名称：
         <el-input v-model="storeName" size="small" style="width: 16vw"></el-input>
       </el-col>
       <el-col :span="3">
@@ -14,10 +14,10 @@
     <!--两个按钮-->
     <el-row :gutter="30">
       <el-col :span="4">
-        <el-button type="primary" size="small" plain @click="addNewStore">新增门店</el-button>
+        <el-button type="primary" size="small" plain @click="addNewStore">新增网点</el-button>
       </el-col>
       <el-col :span="4">
-        <el-button type="primary" size="small" plain @click="allDelete">删除门店</el-button>
+        <el-button type="primary" size="small" plain @click="allDelete">删除网点</el-button>
       </el-col>
     </el-row>
 
@@ -37,7 +37,7 @@
           <span>{{scope.$index+(pageData.currentPage - 1) * pageData.pageSize + 1}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="门店名称" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="name" label="网点名称" show-overflow-tooltip></el-table-column>
       <el-table-column prop="address" label="地址"></el-table-column>
       <el-table-column prop="linkman" label="联系人"></el-table-column>
       <el-table-column prop="phone" label="电话"></el-table-column>
@@ -45,7 +45,7 @@
       <el-table-column align="center" label="删除" width="85">
         <template slot-scope="scope">
           <el-popover placement="top" width="160" :ref="scope.row.id">
-            <p>确定删除此门店？</p>
+            <p>确定删除此网点？</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="handleClose(scope.row.id)">取消</el-button>
               <el-button type="primary" size="mini" @click="handleDelete(scope.row)">确定</el-button>
@@ -96,7 +96,7 @@
       </el-col>
     </el-row>-->
 
-    <!--新增、修改门店弹框-->
+    <!--新增、修改网点弹框-->
     <el-dialog :title="newOrChange" :visible.sync="isShow">
       <el-form
         :model="storeInfo"
@@ -105,10 +105,10 @@
         label-width="100px"
         class="demo-ruleForm"
       >
-        <el-form-item label="门店名称：" prop="name">
+        <el-form-item label="网点名称：" prop="name">
           <el-input v-model="storeInfo.name" style="width: 80%" size="small"></el-input>
         </el-form-item>
-        <el-form-item label="门店地址：" prop="address">
+        <el-form-item label="网点地址：" prop="address">
           <el-input v-model="storeInfo.address" style="width: 80%" size="small"></el-input>
         </el-form-item>
         <el-form-item label="联系人：" prop="linkman">
@@ -167,7 +167,7 @@ export default {
     };
   },
   methods: {
-    // 获取门店列表
+    // 获取网点列表
     getList() {
       this.$get("/store/list", {
         name: this.storeName,
@@ -183,10 +183,10 @@ export default {
       });
     },
 
-    // 新增门店打开模态框
+    // 新增网点打开模态框
     addNewStore() {
       this.isShow = true;
-      this.newOrChange = "新增门店";
+      this.newOrChange = "新增网点";
       this.storeInfo = {
         id: "",
         name: "",
@@ -197,10 +197,10 @@ export default {
       };
     },
 
-    // 修改门店模态框
+    // 修改网点模态框
     handleModify(row) {
       this.isShow = true;
-      this.newOrChange = "修改门店";
+      this.newOrChange = "修改网点";
       this.storeInfo = { ...row };
     },
 
@@ -235,7 +235,7 @@ export default {
       this.$refs[id].doClose();
     },
 
-    // 删除单个门店
+    // 删除单个网点
     handleDelete(row) {
       this.$get("/store/delete", {
         id: row.id,
@@ -248,7 +248,7 @@ export default {
       });
     },
 
-    // 批量删除门店
+    // 批量删除网点
     allDelete() {
       let ids = [];
       this.multipleSelection.forEach((v) => {
@@ -266,7 +266,7 @@ export default {
         });
       } else {
         this.$message({
-          message: "请勾选门店",
+          message: "请勾选网点",
           type: "error",
         });
       }
@@ -300,9 +300,9 @@ export default {
           type: "warning",});
       } else {
         let param = {};
-        param[row.id] = this.storeList[index - 1].sort; //该行的门店id和sort
+        param[row.id] = this.storeList[index - 1].sort; //该行的网点id和sort
         param[this.storeList[index - 1].id] = row.sort; //上一行数据的sort
-        //访问后台接口传入两个调换的门店id和sort值有后台调换顺序，刷新数据
+        //访问后台接口传入两个调换的网点id和sort值有后台调换顺序，刷新数据
         this.switchLocation(param);
       }
     },
@@ -329,7 +329,7 @@ export default {
           type: "warning",});
       } else {
         let param = {};
-        param[row.id] = this.storeList[index + 1].sort; //该行的门店id和下一行的sort
+        param[row.id] = this.storeList[index + 1].sort; //该行的网点id和下一行的sort
         param[this.storeList[index + 1].id] = row.sort; //上一行数据的sort
         this.switchLocation(param);
       }

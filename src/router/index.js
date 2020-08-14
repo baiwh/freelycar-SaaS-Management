@@ -6,7 +6,7 @@ import home from '@/view/home'
 import navApp from '@/router/navApp'
 import StatisticalReportForms from '@/router/StatisticalReportForms'
 
-// 门店管理
+// 网点管理
 import StoreManagement from '@/view/StoreManagement'
 import ServiceProvider from '@/view/ServiceProvider'
 // 账号管理
@@ -44,11 +44,11 @@ export default new Router({
         },
         {
           path: 'StoreManagement',
-          name: '门店管理',
+          name: '网点管理',
           component: StoreManagement
         },{
           path: 'cooperation',
-          name: '门店管理',
+          name: '网点管理',
           component: cooperation
         },
         {

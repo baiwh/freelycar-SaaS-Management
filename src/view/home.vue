@@ -5,7 +5,7 @@
     <el-row :gutter="5">
 
       <el-col :span="5">
-        <span>所属门店：</span>
+        <span>所属网点：</span>
         <el-select clearable v-model="selectStore"
                    @change="getList"
                    placeholder="请选择" style="width: 10vw" size="small">
@@ -68,7 +68,7 @@
         })
       },
 
-      // 获取门店列表
+      // 获取网点列表
       getStoreList() {
         this.$get('/store/list', {
           name: '',
