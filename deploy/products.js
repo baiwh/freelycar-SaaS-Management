@@ -57,10 +57,10 @@ const SERVER_LIST = [
     id: 1,
     name: '生产环境',
     domain: 'www.freelycar.com',
-    host: 'www.freelycar.com',
+    host: '106.14.75.69',
     port: 22,
     username: 'Administrator',
-    password: 'Freelycar2017',
+    password: 'Freelycar@2019',
     path: '/cygdrive/c/nginx/html/management/'
   }
 ];

@@ -6,7 +6,7 @@
         <el-input v-model="arkSn" size="small" style="width: 16vw"></el-input>
       </el-col>
       <el-col :span="8">所属网点：
-        <el-select v-model="storeId" clearable placeholder="请选择" style="width: 16vw" size="small">
+        <el-select filterable v-model="storeId" clearable placeholder="请选择或输入查找" style="width: 16vw" size="small">
           <el-option v-for="item in storeList" :key="item.id" :label="item.name"
                      :value="item.id"></el-option>
         </el-select>
@@ -62,7 +62,7 @@
           <el-input v-model="arkForm.sn" style="width: 80%" size="small"></el-input>
         </el-form-item>
         <el-form-item label="所属网点：" prop="storeId">
-          <el-select v-model="arkForm.storeId" placeholder="请选择" style="width: 27vw" size="small">
+          <el-select filterable v-model="arkForm.storeId" placeholder="请选择或输入查找" style="width: 27vw" size="small">
             <el-option v-for="item in storeList" :key="item.id" :label="item.name"
                        :value="item.id"></el-option>
           </el-select>
