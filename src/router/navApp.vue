@@ -43,7 +43,7 @@
               </template>
             </el-menu-item>
 
-            <el-menu-item index="/ServiceProvider">
+            <el-menu-item index="/Servicer">
               <template slot="title">
                 <i class="el-icon-star-on"></i>
                 <span>服务商管理</span>

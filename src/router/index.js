@@ -8,7 +8,7 @@ import StatisticalReportForms from '@/router/StatisticalReportForms'
 
 // 网点管理
 import StoreManagement from '@/view/StoreManagement'
-import ServiceProvider from '@/view/ServiceProvider'
+import Servicer from '@/view/Servicer'
 // 账号管理
 import AccountManagement from '@/view/AccountManagement'
 import cooperation from '@/view/cooperation'
@@ -56,9 +56,9 @@ export default new Router({
           name: '账号管理',
           component: AccountManagement
         },{
-          path: 'ServiceProvider',
+          path: 'Servicer',
           name: '服务商管理',
-          component: ServiceProvider
+          component: Servicer
         },
         {
           path: 'StatisticalReportForms',

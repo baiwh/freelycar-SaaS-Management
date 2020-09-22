@@ -39,8 +39,7 @@
       </el-table-column>
       <el-table-column prop="name" label="网点名称" show-overflow-tooltip></el-table-column>
       <el-table-column prop="address" label="地址"></el-table-column>
-      <el-table-column prop="linkman" label="联系人"></el-table-column>
-      <el-table-column prop="phone" label="电话"></el-table-column>
+      <el-table-column prop="username" label="账号名称" width="85"></el-table-column>
       <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
       <el-table-column align="center" label="删除" width="85">
         <template slot-scope="scope">
@@ -57,6 +56,11 @@
       <el-table-column align="center" label="修改" width="85">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleModify(scope.row)">修改</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="账号" width="85">
+        <template slot-scope="scope">
+          <el-button size="mini" type="primary" @click="closeAccount(scope.row)">关闭</el-button>
         </template>
       </el-table-column>
       <el-table-column align="center" label="排序" width="170">
@@ -111,11 +115,12 @@
         <el-form-item label="网点地址：" prop="address">
           <el-input v-model="storeInfo.address" style="width: 80%" size="small"></el-input>
         </el-form-item>
-        <el-form-item label="联系人：" prop="linkman">
-          <el-input v-model="storeInfo.linkman" style="width: 80%" size="small"></el-input>
+        <!-- 修改为账号名称和密码 -->
+        <el-form-item label="账号名称：" prop="username">
+          <el-input v-model="storeInfo.username" style="width: 80%" size="small"></el-input>
         </el-form-item>
-        <el-form-item label="电话：" prop="phone">
-          <el-input type="number" v-model.number="storeInfo.phone" style="width: 80%" size="small"></el-input>
+        <el-form-item label="密码：" prop="password">
+          <el-input v-model="storeInfo.password" style="width: 80%" size="small"></el-input>
         </el-form-item>
         <el-form-item label="备注：" prop="remark">
           <el-input
@@ -146,6 +151,8 @@ export default {
       rules: {
         name: [{ required: true, message: "请输入名称", trigger: "change" }],
         address: [{ required: true, message: "请输入地址", trigger: "blur" }],
+        username:[{required:true,message:"请输入账号名称",trigger:"blur"}],
+        password:[{required:true,message:"请输入密码",trigger:"blur"}]
       },
       pageData: {
         currentPage: 1,
@@ -164,7 +171,7 @@ export default {
       newOrChange: "",
       isShow: false,
       show: false,
-    };
+    }
   },
   methods: {
     // 获取网点列表
@@ -174,9 +181,10 @@ export default {
         currentPage: this.pageData.currentPage,
         pageSize: this.pageData.pageSize,
       }).then((res) => {
-        // console.log(res);
+        console.log(res);
         this.loading = false;
         this.storeList = res.data;
+        
         this.pageData.currentPage = res.currentPage;
         this.pageData.pageSize = res.pageSize;
         this.pageData.pageTotal = res.total;

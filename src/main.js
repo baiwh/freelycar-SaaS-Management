@@ -11,6 +11,12 @@ import addNewButton from './components/addNewButton'
 import pagingDevice from './components/pagingDevice'
 import Vuex from 'vuex'
 
+//引用地图
+import BaiduMap from 'vue-baidu-map'
+Vue.use(BaiduMap, {
+  ak: 'aOYxcgNT3v3I7UGrZcRpGqnFgnU0xZdN'
+});
+
 Vue.use(Vuex)
 
 // 引入elementUI

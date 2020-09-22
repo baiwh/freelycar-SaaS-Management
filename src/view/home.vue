@@ -1,108 +1,191 @@
 <template>
   <div>
-    <!--<img class="page-center" src="./../../static/logo.jpg" alt="logo">-->
     <div class="page-center">数据统计</div>
     <el-row :gutter="5">
-
-      <el-col :span="5">
+      <el-col :span="6">
         <span>所属网点：</span>
-        <el-select clearable v-model="selectStore"
-                   @change="getList"
-                   placeholder="请选择" style="width: 10vw" size="small">
-          <el-option v-for="item in storeList" :key="item.id"
-                     :label="item.name" :value="item.id"></el-option>
+        <el-select
+          clearable
+          v-model="selectStore"
+          @change="getList"
+          placeholder="请选择"
+          style="width: 10vw"
+          size="small"
+        >
+          <el-option v-for="item in storeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-col>
 
-      <el-col :span="7">
+      <el-col :span="8">
         <span>查找日期：</span>
         <el-date-picker
           v-model="datePickerValue"
           type="date"
           value-format="yyyy-MM-dd"
           size="small"
-          placeholder="选择日期">
-        </el-date-picker>
-
+          placeholder="选择日期"
+        ></el-date-picker>
       </el-col>
       <el-col :span="5">
         <el-button type="primary" @click="getList" size="small">查询</el-button>
       </el-col>
-
     </el-row>
 
     <el-table v-loading="loading" :data="dataList">
-      <el-table-column property="cumulateUserCount" :label="newyesterdayFlag"
-                        align="center"/>
-      <el-table-column property="registerUserCount" label="注册人数" align="center"/>
-      <el-table-column property="orderCount" label="订单数" align="center"/>
+      <el-table-column property="cumulateUserCount" :label="newyesterdayFlag" align="center" />
+      <el-table-column property="registerUserCount" label="注册人数" align="center" />
+      <el-table-column property="orderCount" label="订单数" align="center" />
     </el-table>
+    <div class="echarts-box" id="echarts">注册与订单数</div>
   </div>
 </template>
 
 <script>
-  export default {
-    name: 'home',
-    data(){
-      return{
-        selectStore:'',
-        storeList:[],
-        datePickerValue:'',
-        dataList:[],
-        loading:true,
-        yesterdayFlag:false,
-      }
-    },
-    methods:{
-      // 获取列表
-      getList(){
-        this.loading=true
-        this.$get('/wxUserInfo/getCumulateThree', {
-          storeId: this.selectStore,
-          refDate: this.datePickerValue
-        }).then(res => {
-          this.loading=false
-          let list = [res]
-          this.dataList = list
-          this.yesterdayFlag=this.dataList[0].yesterdayFlag
-        })
-      },
-
-      // 获取网点列表
-      getStoreList() {
-        this.$get('/store/list', {
-          name: '',
-          currentPage: 1,
-          pageSize: 100
-        }).then(res => {
-          this.storeList = res.data
-        })
-      },
-    },
-    computed:{
-      newyesterdayFlag:function(){
-        return this.yesterdayFlag?'昨日关注人数':'当日关注人数';
-      }
-    },
-    mounted: function () {
-      let date = new Date()
-      let year = date.getFullYear()
-      let month = date.getMonth() < 9 ? '-0' + (date.getMonth() + 1) : '-' + (date.getMonth() + 1)
-      let day = date.getDate() < 10 ? '-0' + date.getDate() : '-' + date.getDate()
-      this.datePickerValue = year + month + day
-      this.getList()
-      this.getStoreList()
+import echarts from "echarts";
+export default {
+  name: "home",
+  data() {
+    return {
+      selectStore: "",
+      storeList: [],
+      datePickerValue: "",
+      dataList: [],
+      loading: true,
+      yesterdayFlag: false,
     }
-  }
+  },
+  methods: {
+    // 获取列表
+    getList() {
+      this.loading = true;
+      console.log(this.datePickerValue)
+      this.$get("/wxUserInfo/getCumulateThree", {
+        storeId: this.selectStore,
+        refDate: this.datePickerValue,
+      }).then((res) => {
+        this.loading = false;
+        let list = [res];
+        this.dataList = list;
+        console.log(this.dataList);
+        this.yesterdayFlag = this.dataList[0].yesterdayFlag;
+
+        //折线图
+        let myChart = echarts.init(document.getElementById("echarts"));
+        myChart.setOption({
+          title: {
+            text: '所有门店每月注册和订单数',
+        },
+        tooltip : {
+            trigger: 'item',
+         },
+        legend: {
+          type:"plain",
+          top:20,
+          data:['注册人数','订单数']
+        },
+          xAxis: {
+            type: "category",
+            axisLabel: {
+              show: true,
+            },
+            data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+          },
+          yAxis: [
+            {
+              type: "value",
+              position: "left",
+              name:"注\n册\n人\n数\n︵\n次\n︶",
+              nameLocation:"center",
+              nameGap:35,
+              nameRotate:0,
+              nameTextStyle:{
+                fontSize: 16,
+                },
+            },
+            {
+              type: "value",
+              position: "right",
+              name:"订\n单\n数\n︵\n个\n︶",
+              nameLocation:"center",
+              nameGap:35,
+              nameRotate:0,
+              nameTextStyle:{
+                fontSize: 16,
+                },
+            },
+          ],
+          series: [
+            {
+              name:"注册人数",
+              data: [10,20,30,50,20,30,10],
+              type: "line",
+              yAxisIndex: 0, // 通过这个判断左右
+              smooth: true,
+            },
+            {
+              name:"订单数",
+              data:[35,15,8,12,11,6,3],
+              type: "line",
+              yAxisIndex: 1,
+              smooth: true,
+            },
+          ],
+        });
+      });
+    },
+
+    // 获取网点列表
+    getStoreList() {
+      this.$get("/store/list", {
+        name: "",
+        currentPage: 1,
+        pageSize: 100,
+      }).then((res) => {
+        this.storeList = res.data;
+      });
+    },
+  },
+  computed: {
+    newyesterdayFlag: function () {
+      return this.yesterdayFlag ? "当日关注人数" : "昨日关注人数";
+    },
+  },
+  mounted: function () {
+    let date = new Date();
+    let year = date.getFullYear();
+    let month =
+      date.getMonth() < 9
+        ? "-0" + (date.getMonth() + 1)
+        : "-" + (date.getMonth() + 1);
+    let day =
+      date.getDate() < 10 ? "-0" + date.getDate() : "-" + date.getDate();
+    this.datePickerValue = year + month + day;
+    this.getList();
+    this.getStoreList();
+  },
+};
 </script>
 <style lang="less" scoped>
-  .page-center{
-    transform: translateX(-50%);
-    left: 45%;
-    position: relative;
-    width: 300px;
-    text-align: center;
-    margin: 50px 0;
-  }
+.page-center {
+  transform: translateX(-50%);
+  left: 45%;
+  position: relative;
+  width: 300px;
+  text-align: center;
+  margin: 5px 0 10px 0;
+}
+.container {
+  width: 100%;
+  text-align: center;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  margin: 300px auto;
+  border: 0;
+}
+.echarts-box {
+  height: 400px;
+  width: 100%;
+}
 </style>
 
