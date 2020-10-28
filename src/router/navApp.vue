@@ -50,12 +50,12 @@
               </template>
             </el-menu-item>
 
-            <el-menu-item index="/AccountManagement">
+            <!-- <el-menu-item index="/AccountManagement">
               <template slot="title">
                 <i class="el-icon-star-on"></i>
                 <span>账号管理</span>
               </template>
-            </el-menu-item>
+            </el-menu-item> -->
 
             <el-submenu index="统计报表">
               <template slot="title">

@@ -69,8 +69,35 @@ export default {
         console.log(this.dataList);
         this.yesterdayFlag = this.dataList[0].yesterdayFlag;
 
+        
+      });
+    },
+
+    // 获取网点列表
+    getStoreList() {
+      this.$get("/store/list", {
+        name: "",
+        currentPage: 1,
+        pageSize: 100,
+      }).then((res) => {
+        this.storeList = res.data;
+      });
+    },
+    getChartData(){
+      this.$get('/wxUserInfo/getCumulateChart')
+      .then((res)=>{
+        console.log(res)
         //折线图
         let myChart = echarts.init(document.getElementById("echarts"));
+        var timedata = [];
+        var orderCount = [];
+        var registerUserCount = [];
+        for(var i in res){
+          let index = res.length-i-1;
+          timedata.push(res[index].createDate);
+          orderCount.push(res[index].orderCount)
+          registerUserCount.push(res[index].registerUserCount);
+        }
         myChart.setOption({
           title: {
             text: '所有门店每月注册和订单数',
@@ -85,10 +112,11 @@ export default {
         },
           xAxis: {
             type: "category",
+            name:"时间",
             axisLabel: {
               show: true,
             },
-            data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+            data : timedata
           },
           yAxis: [
             {
@@ -117,14 +145,14 @@ export default {
           series: [
             {
               name:"注册人数",
-              data: [10,20,30,50,20,30,10],
+              data: registerUserCount,
               type: "line",
               yAxisIndex: 0, // 通过这个判断左右
               smooth: true,
             },
             {
               name:"订单数",
-              data:[35,15,8,12,11,6,3],
+              data:orderCount,
               type: "line",
               yAxisIndex: 1,
               smooth: true,
@@ -132,18 +160,7 @@ export default {
           ],
         });
       });
-    },
-
-    // 获取网点列表
-    getStoreList() {
-      this.$get("/store/list", {
-        name: "",
-        currentPage: 1,
-        pageSize: 100,
-      }).then((res) => {
-        this.storeList = res.data;
-      });
-    },
+    }
   },
   computed: {
     newyesterdayFlag: function () {
@@ -162,6 +179,7 @@ export default {
     this.datePickerValue = year + month + day;
     this.getList();
     this.getStoreList();
+    this.getChartData();
   },
 };
 </script>

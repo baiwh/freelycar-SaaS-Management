@@ -30,13 +30,17 @@
     <el-table ref="multipleTable" :data="cabinetList" tooltip-effect="dark" border
               @selection-change="handleSelectionChange" v-loading="loading">
       <el-table-column type="selection"></el-table-column>
-      <el-table-column label="序号" type="index"></el-table-column>
-      <el-table-column prop="sn" label="智能柜序号"></el-table-column>
-      <el-table-column prop="storeId" label="所属网点" :formatter="storeFormat"></el-table-column>
-      <el-table-column prop="location" label="投放位置"></el-table-column>
-      <el-table-column prop="doorNum" label="规格"></el-table-column>
-      <el-table-column prop="createTime" label="创建时间"></el-table-column>
-      <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
+      <el-table-column label="序号" type="index" width="70px">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(pageData.currentPage - 1) * pageData.pageSize + 1}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="sn" label="智能柜序号" width="150px"></el-table-column>
+      <el-table-column prop="storeId" label="所属网点" :formatter="storeFormat" width="130px"></el-table-column>
+      <el-table-column prop="location" label="投放位置" width="130px"></el-table-column>
+      <el-table-column prop="doorNum" label="规格" width="60px"></el-table-column>
+      <el-table-column prop="createTime" label="创建时间" ></el-table-column>
+      <el-table-column prop="remark" label="备注"  show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleModify(scope.row)">修改</el-button>

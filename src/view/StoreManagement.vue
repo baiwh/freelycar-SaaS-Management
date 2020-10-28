@@ -43,14 +43,14 @@
       <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
       <el-table-column align="center" label="删除" width="85">
         <template slot-scope="scope">
-          <el-popover placement="top" width="160" :ref="scope.row.id">
+          <el-popover placement="top" width="160" :ref="scope.row.storeId">
             <p>确定删除此网点？</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="handleClose(scope.row.id)">取消</el-button>
+              <el-button size="mini" type="text" @click="handleClose(scope.row.storeId)">取消</el-button>
               <el-button type="primary" size="mini" @click="handleDelete(scope.row)">确定</el-button>
             </div>
           </el-popover>
-          <el-button size="mini" v-popover="scope.row.id" type="danger">删除</el-button>
+          <el-button size="mini" v-popover="scope.row.storeId" type="danger">删除</el-button>
         </template>
       </el-table-column>
       <el-table-column align="center" label="修改" width="85">
@@ -60,7 +60,7 @@
       </el-table-column>
       <el-table-column align="center" label="账号" width="85">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="closeAccount(scope.row)">关闭</el-button>
+          <el-button size="mini" type="primary" :class="{'active':scope.row.openStatus}" @click="closeOrOpenAccount(scope.row)">{{scope.row.openStatus==true?"关闭":"开启"}}</el-button>
         </template>
       </el-table-column>
       <el-table-column align="center" label="排序" width="170">
@@ -160,12 +160,12 @@ export default {
         pageTotal: 100,
       },
       storeInfo: {
-        id: "",
+        storeId: "",
         name: "",
         address: "",
-        linkman: "",
         phone: "",
         remark: "",
+        sysUserId:"",
       },
       multipleSelection: [],
       newOrChange: "",
@@ -176,7 +176,7 @@ export default {
   methods: {
     // 获取网点列表
     getList() {
-      this.$get("/store/list", {
+      this.$get("/store/listStoreAccount", {
         name: this.storeName,
         currentPage: this.pageData.currentPage,
         pageSize: this.pageData.pageSize,
@@ -184,7 +184,7 @@ export default {
         console.log(res);
         this.loading = false;
         this.storeList = res.data;
-        
+        console.log(res)
         this.pageData.currentPage = res.currentPage;
         this.pageData.pageSize = res.pageSize;
         this.pageData.pageTotal = res.total;
@@ -196,10 +196,9 @@ export default {
       this.isShow = true;
       this.newOrChange = "新增网点";
       this.storeInfo = {
-        id: "",
+        storeId: "",
         name: "",
         address: "",
-        linkman: "",
         phone: "",
         remark: "",
       };
@@ -207,6 +206,7 @@ export default {
 
     // 修改网点模态框
     handleModify(row) {
+      console.log(row)
       this.isShow = true;
       this.newOrChange = "修改网点";
       this.storeInfo = { ...row };
@@ -214,17 +214,20 @@ export default {
 
     // 提交新增、修改
     storeSubmit(formName) {
+      console.log('11')
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.isShow = false;
           this.$post("/store/modify", {
-            id: this.storeInfo.id,
+            storeId: this.storeInfo.storeId,
             name: this.storeInfo.name,
             address: this.storeInfo.address,
-            linkman: this.storeInfo.linkman,
-            phone: this.storeInfo.phone,
             remark: this.storeInfo.remark,
+            username: this.storeInfo.username,
+            password: this.storeInfo.password,
+            sysUserId:this.storeInfo.sysUserId
           }).then((res) => {
+            console.log(res)
             this.$message({
               message: "提交成功",
               type: "success",
@@ -246,7 +249,7 @@ export default {
     // 删除单个网点
     handleDelete(row) {
       this.$get("/store/delete", {
-        id: row.id,
+        id: row.storeId,
       }).then((res) => {
         this.$message({
           message: "删除成功",
@@ -287,18 +290,20 @@ export default {
 
     // 上移
     upLayer(index, row) {
+      console.log(row)
       if (index == 0 && row.sort!== 10) {
         let param = {};
         let prestore;
+        console.log(index)
         this.$get("/store/list", {
           name: this.storeName,
           currentPage: this.pageData.currentPage-1,
           pageSize: this.pageData.pageSize,
       }).then((res) => {
-        // console.log(res)
+        console.log(res)
         prestore = res.data[9];
-        param[row.id] = prestore.sort;
-        param[prestore.id] = row.sort;
+        param[row.storeId] = prestore.sort;
+        param[prestore.storeId] = row.sort;
         this.switchLocation(param);
 
       });
@@ -308,8 +313,9 @@ export default {
           type: "warning",});
       } else {
         let param = {};
-        param[row.id] = this.storeList[index - 1].sort; //该行的网点id和sort
-        param[this.storeList[index - 1].id] = row.sort; //上一行数据的sort
+        param[row.storeId] = this.storeList[index - 1].sort; //该行的网点id和sort
+        param[this.storeList[index - 1].storeId] = row.sort; //上一行数据的sort
+        console.log(param)
         //访问后台接口传入两个调换的网点id和sort值有后台调换顺序，刷新数据
         this.switchLocation(param);
       }
@@ -326,8 +332,8 @@ export default {
           pageSize: this.pageData.pageSize,
       }).then((res) => {
         nextstore = res.data[0];
-        param[row.id] = nextstore.sort;
-        param[nextstore.id] = row.sort;
+        param[row.storeId] = nextstore.sort;
+        param[nextstore.storeId] = row.sort;
         this.switchLocation(param);
 
       });
@@ -337,13 +343,14 @@ export default {
           type: "warning",});
       } else {
         let param = {};
-        param[row.id] = this.storeList[index + 1].sort; //该行的网点id和下一行的sort
-        param[this.storeList[index + 1].id] = row.sort; //上一行数据的sort
+        param[row.storeId] = this.storeList[index + 1].sort; //该行的网点id和下一行的sort
+        param[this.storeList[index + 1].storeId] = row.sort; //上一行数据的sort
         this.switchLocation(param);
       }
     },
     //移动请求
     switchLocation(param) {
+      console.log('移动')
       this.$post("/store/switchLocation", param).then((res) => {
         this.$message({
           message: "移动成功",
@@ -352,6 +359,34 @@ export default {
         this.getList();
       });
     },
+    closeOrOpenAccount(row){
+      //关闭账号
+      console.log(row.openStatus);
+      console.log(row.sysUserId)
+      if(row.openStatus){
+        this.$get("/sysUser/close",{
+          id:row.sysUserId
+        }).then((res)=>{
+          console.log(res)
+          this.getList();
+          this.$message({
+            message:"关闭成功",
+            type:"success",
+          });
+        })
+      }else{
+        this.$get("/sysUser/open",{
+          id:row.sysUserId
+        }).then((res)=>{
+          console.log(res)
+          this.getList();
+          this.$message({
+            message:"开启成功",
+            type:"success",
+          });
+        })
+      }
+    }
   },
   mounted: function () {
     this.getList();
@@ -362,5 +397,9 @@ export default {
 <style lang="less" scoped>
 .el-row {
   margin-bottom: 30px;
+}
+.active{
+  border:none;
+  background-color:#f56c6c;
 }
 </style>

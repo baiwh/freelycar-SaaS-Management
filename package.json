@@ -5,7 +5,7 @@
   "author": "y",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js --host 192.168.0.179",
     "start": "npm run dev",
     "build": "node build/build.js",
     "deploy:dev": "npm run build && cross-env NODE_ENV=dev node ./deploy",
