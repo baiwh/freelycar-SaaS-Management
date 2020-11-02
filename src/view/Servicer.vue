@@ -377,6 +377,7 @@
                 placeholder="请选择或输入查找"
                 style="width: 20vw"
                 size="small"
+                clearable
               >
                 <el-option
                   v-for="item in storeList"

@@ -29,22 +29,23 @@
         <span>服务商</span>
         <el-select
           filterable
-          v-model="servicerid"
+          v-model="rspId"
           clearable
           placeholder="请选择或输入查找"
           style="width: 10vw"
           size="small"
+          @change="changeService($event)"
         >
           <el-option
-            v-for="item in ServiceList"
+            v-for="(item,index) in ServiceList"
             :key="item.id"
             :label="item.name"
-            :value="item.name"
+            :value="index"
           ></el-option>
         </el-select>
         <el-radio-group
           v-model="tabTimePosition"
-          @change="onButtonChange"
+          @change="onServiceChange"
           size="small"
         >
           <el-radio-button label="today">今日</el-radio-button>
@@ -102,7 +103,7 @@
         <el-button
           v-show="tabItemPosition == 'service'"
           type="primary"
-          @click="searchServicerData"
+          @click="timeService"
           size="small"
           >查询</el-button
         >
@@ -150,11 +151,18 @@
     <el-row v-show="tabItemPosition == 'service'">
       <div class="service-echart" id="servicerEcharts"></div>
     </el-row>
-    <el-row v-show="tabItemPosition == 'service'">
+    <el-row v-show="tabItemPosition == 'service' && !service">
       <el-table :data="servicerList" border style="width: 93%">
-        <el-table-column prop="name" label="服务商名称"></el-table-column>
-        <el-table-column prop="price" label="营业额"></el-table-column>
-        <el-table-column prop="ratio" label="占比"></el-table-column>
+        <el-table-column prop="0" label="服务商名称"></el-table-column>
+        <el-table-column prop="1" label="营业额"></el-table-column>
+        <el-table-column prop="2" label="占比"></el-table-column>
+      </el-table>
+    </el-row>
+    <el-row v-show="tabItemPosition == 'service' && service ">
+      <el-table :data="servicerList" border style="width: 93%">
+        <el-table-column prop="0" label="网点名称"></el-table-column>
+        <el-table-column prop="1" label="营业额"></el-table-column>
+        <el-table-column prop="2" label="占比"></el-table-column>
       </el-table>
     </el-row>
     <!-- 网点 -->
@@ -217,10 +225,7 @@ export default {
         "11月",
         "12月",
       ],
-      servicerList: [
-        { id: 1, name: "服务商A", price: "10000", ratio: "50%" },
-        { id: 2, name: "服务商B", price: "20000", ratio: "50%" },
-      ],
+      servicerList: [],
       servicerid: "",
       ServiceList: "",
       servicerOption: "",
@@ -235,6 +240,8 @@ export default {
       startTime: "",
       endTime: "",
       store:null,
+      rspId:'',
+      service:null
     };
   },
   methods: {
@@ -404,10 +411,33 @@ export default {
         myChart.setOption(this.option);
       });
     },
+    changeService(e){
+      console.log(e);
+      this.service = this.ServiceList[e];
+      this.searchServicerData();
+    },
     searchServicerData() {
+      this.$get("/order/getIncomeByRsp",{
+        rspId:this.service?this.service.id:'',
+        startTime:this.startTime,
+        endTime:this.endTime,
+      }).then((res)=>{
+        console.log(res)
+        var serviceList =[],
+        price = [];
+        this.sum = res.sum;
+        this.servicerList =res.list;
+        for(let i in res.list){
+          serviceList.push(res.list[i][0]);
+          price.push(res.list[i][1]);
+        }
+        let servicename = "服务商营业统计（元）";
+        if(this.service){
+          servicename=this.service.name+"各网点营业统计（元）";
+        }
       this.servicerOption = {
         title: {
-          text: "服务商营业统计（元）",
+          text: servicename,
         },
         tooltip: {
           trigger: "axis",
@@ -421,13 +451,13 @@ export default {
         },
         yAxis: {
           type: "category",
-          data: ["服务商A", "服务商B", "服务商C"],
+          data: serviceList,
         },
         series: [
           {
             name: "营业额",
             type: "bar",
-            data: [18203, 23489, 120000],
+            data: price,
             barWidth: 30,
             itemStyle: {
               normal: {
@@ -442,7 +472,9 @@ export default {
         document.getElementById("servicerEcharts")
       );
       servicerChart.setOption(this.servicerOption);
+    });
     },
+    
 
     onButtonChange(e) {
       console.log(e);
@@ -452,6 +484,15 @@ export default {
       }else if (e =='thisMonth'){
         this.setMonth();
         this.searchStoreData();
+      }
+    },
+    onServiceChange(e){
+      if (e == "today") {
+        this.setToday();
+        this.searchServicerData();
+      }else if (e =='thisMonth'){
+        this.setMonth();
+        this.searchServicerData();
       }
     },
     changeStore(e){
@@ -466,6 +507,8 @@ export default {
         this.searchStoreData();
       }else if (e =="time"){
         this.searchData();
+      }else if (e =="service"){
+        this.searchServicerData();
       }
     },
     setToday(){
@@ -494,6 +537,11 @@ export default {
       this.startTime = this.datePickerValue[0];
       this.endTime = this.datePickerValue[1];
       this.searchStoreData();
+    },
+    timeService(){
+      this.startTime = this.datePickerValue[0];
+      this.endTime = this.datePickerValue[1];
+      this.searchServicerData();
     },
     searchStoreData() {
       this.$get("/order/getIncomeByStore", {
@@ -595,7 +643,6 @@ export default {
 
   mounted: function () {
     this.searchData();
-    this.searchServicerData();
     this.getServiceList();
     this.getStoreList();
   },
