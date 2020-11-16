@@ -239,11 +239,6 @@
         label="时间"
         align="center"
       ></el-table-column>
-      <el-table-column
-        property="isMember"
-        label="是否是会员"
-        align="center"
-      ></el-table-column>
     </el-table>
     <pagingDevice
       v-show="tabItemPosition == 'service'"

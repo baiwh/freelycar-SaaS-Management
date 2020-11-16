@@ -26,7 +26,7 @@
       <el-container>
 
         <el-aside width="200px">
-          <el-menu default-active="active" class="el-menu-vertical-demo"
+          <el-menu :default-active="$route.path" class="el-menu-vertical-demo"
                    :collapse="isCollapse" :router="true">
 
             <el-menu-item index="/home">
@@ -94,9 +94,9 @@
           </el-menu>
         </el-aside>
 
-        <el-main>
+        <el-main class="main">
           <el-container>
-            <el-header class="nav-title">
+            <el-header class="nav-title" style="height:40px;">
               <el-row>
                 <!--<el-col :span="1">-->
                 <!--<el-button icon="el-icon-d-arrow-left" circle @click="modifyNav"></el-button>-->
@@ -155,7 +155,7 @@
       }
     },
     mounted() {
-    }
+    },
   }
 </script>
 
@@ -185,7 +185,9 @@
   .user-name {
     color: white;
   }
-
+  .main{
+    padding: 0 16px 16px 16px !important;
+  }
   #app {
   }
 </style>

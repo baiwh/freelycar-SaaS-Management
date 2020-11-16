@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class="minwidth">
     <!-- 服务商列表模块 -->
-    <div v-show="tabShow">
+    <div v-show="tabShow" >
       <!--查询条件-->
       <el-row>
-        <el-col :span="10">
+        <el-col :span="8">
           服务商名称：
           <el-input
             v-model="serviceProviderName"
@@ -45,8 +45,12 @@
         <el-table-column type="selection"></el-table-column>
         <el-table-column label="序号" type="index">
           <template slot-scope="scope">
-          <span>{{scope.$index+(servicePageData.currentPage - 1) * servicePageData.pageSize + 1}}</span>
-        </template>
+            <span>{{
+              scope.$index +
+              (servicePageData.currentPage - 1) * servicePageData.pageSize +
+              1
+            }}</span>
+          </template>
         </el-table-column>
         <el-table-column
           prop="name"
@@ -150,7 +154,7 @@
       </el-row>
 
       <!--新增、修改网点弹框-->
-      <el-dialog :title="newOrChange" :visible.sync="isShow">
+      <el-dialog :title="newOrChange" :visible.sync="isShow" @close="closeShow">
         <el-form
           :model="serviceProviderInfo"
           :rules="rules"
@@ -201,6 +205,7 @@
               v-model="serviceProviderInfo.longitude"
               style="width: 80%"
               size="small"
+              :disabled="true"
             ></el-input>
           </el-form-item>
           <el-form-item label="纬度（lat）：" prop="addressLat">
@@ -208,11 +213,14 @@
               v-model="serviceProviderInfo.latitude"
               style="width: 80%"
               size="small"
+              :disabled="true"
             ></el-input>
           </el-form-item>
           <el-form-item label="电话：" prop="phone">
             <el-input
               type="number"
+              @mousewheel.native.prevent
+              @DOMMouseScroll.native.prevent
               v-model.number="serviceProviderInfo.phone"
               style="width: 80%"
               size="small"
@@ -228,7 +236,7 @@
             ></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button @click="isShow = false">取 消</el-button>
+            <el-button @click="closeShow">取 消</el-button>
             <el-button
               type="primary"
               @click="serviceSubmit('serviceProviderInfo')"
@@ -255,7 +263,11 @@
           <el-row>
             <el-col :span="10">
               服务项目：
-              <el-input size="small" style="width: 16vw"></el-input>
+              <el-input
+                size="small"
+                style="width: 16vw"
+                v-model="projectName"
+              ></el-input>
             </el-col>
             <el-col :span="3">
               <el-button type="primary" size="small" @click="getItemList"
@@ -271,7 +283,7 @@
               >
             </el-col>
             <el-col :span="4">
-              <el-button type="primary" size="small" plain
+              <el-button type="primary" size="small" plain @click="deleteItem"
                 >删除服务项目</el-button
               >
             </el-col>
@@ -405,7 +417,13 @@
               >
             </el-col>
             <el-col :span="4">
-              <el-button type="primary" size="small" plain>删除技师</el-button>
+              <el-button
+                type="primary"
+                size="small"
+                plain
+                @click="deleteTechnicians"
+                >删除技师</el-button
+              >
             </el-col>
           </el-row>
           <el-table
@@ -545,14 +563,14 @@
             v-loading="loading"
           >
             <el-table-column type="selection"></el-table-column>
-            <el-table-column
-              label="序号"
-              type="index"
-              width="85"
-            >
-            <template slot-scope="scope">
-          <span>{{scope.$index+(pageData.currentPage - 1) * pageData.pageSize + 1}}</span>
-        </template>
+            <el-table-column label="序号" type="index" width="85">
+              <template slot-scope="scope">
+                <span>{{
+                  scope.$index +
+                  (pageData.currentPage - 1) * pageData.pageSize +
+                  1
+                }}</span>
+              </template>
             </el-table-column>
             <el-table-column
               prop="name"
@@ -637,6 +655,9 @@
           </el-form-item>
           <el-form-item label="手机号" prop="phone">
             <el-input
+              type="number"
+              @mousewheel.native.prevent
+              @DOMMouseScroll.native.prevent
               v-model="technician.phone"
               placeholder="请输入手机号"
               style="width: 80%"
@@ -691,6 +712,16 @@
 export default {
   name: "Servicer",
   data() {
+    var checkData = (rule, value, callback) => {
+      if (value) {
+        if (/[^\w\.\/]/gi.test(value)) {
+          callback(new Error("请不要输入中文和空格！"));
+        } else {
+          callback();
+        }
+      }
+      callback();
+    };
     return {
       loading: "",
       serviceProviderName: "",
@@ -707,7 +738,10 @@ export default {
       technicianrules: {
         name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
         phone: [{ required: true, message: "请输入手机号", trigger: "blur" }],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          { validator: checkData, trigger: "blur" },
+        ],
         serviceStore: [
           { required: true, message: "请选择服务网点", trigger: "blur" },
         ],
@@ -872,6 +906,10 @@ export default {
         }
       });
     },
+    closeShow() {
+      this.isShow = false;
+      this.mapLocation.address = "";
+    },
 
     // 关闭提示小窗口
     handleClose(id) {
@@ -886,6 +924,7 @@ export default {
           message: "删除成功",
           type: "success",
         });
+        this.$refs[`'service'+${row.id}`].doClose();
         this.getList();
       });
     },
@@ -915,6 +954,7 @@ export default {
     // 多选功能
     handleSelectionChange(val) {
       this.multipleSelection = val;
+      console.log(val);
     },
     handlerBMap({ BMap, map }) {
       this.BMap = BMap;
@@ -997,14 +1037,14 @@ export default {
     },
     //技师管理等操作
     handleClick(tab, event) {
-      console.log(tab, event);
+      this.multipleSelection = [];
+      // console.log(tab, event);
+      console.log(this.multipleSelection);
     },
     //删除技师
     handleDeleteTechnician(row) {
       console.log(row);
-      this.$get("/sp/staff/delete", {
-        id: row.id,
-      }).then((res) => {
+      this.$post("/sp/staff/delete", [row.id]).then((res) => {
         console.log(res);
         this.$refs[row.id].doClose();
         this.$message({
@@ -1013,6 +1053,27 @@ export default {
         });
         this.getTechnicianList();
       });
+    },
+
+    deleteTechnicians() {
+      let ids = [];
+      this.multipleSelection.forEach((v) => {
+        ids.push(v.id);
+      });
+      if (this.multipleSelection.length > 0) {
+        this.$post("/sp/staff/delete", ids).then((res) => {
+          this.$message({
+            message: "删除成功",
+            type: "success",
+          });
+          this.getTechnicianList();
+        });
+      } else {
+        this.$message({
+          message: "请勾选技师",
+          type: "error",
+        });
+      }
     },
     //开启关闭智能柜技师智能柜服务
     openOrCloseTechnician(row) {
@@ -1097,8 +1158,12 @@ export default {
       this.technicianShow = true;
       this.technicianTitle = "修改技师";
       this.technician = { ...row };
-      // console.log(row.stores)
-      this.technicianserviceStore = [];
+      console.log(row);
+      console.log(this.technicianserviceStore)
+      this.technicianserviceStore =[];
+      for (let i in row.stores) {
+        this.technicianserviceStore.push(row.stores[i].id);
+      }
       // 服务商已选网点
       this.$get("/sp/store/listStore", {
         rspId: this.rspId,
@@ -1265,6 +1330,27 @@ export default {
         this.getItemList();
       });
     },
+    //多选删除服务项目
+    deleteItem() {
+      let ids = [];
+      this.multipleSelection.forEach((v) => {
+        ids.push(v.id);
+      });
+      if (this.multipleSelection.length > 0) {
+        this.$post("/sp/project/delete", ids).then((res) => {
+          this.$message({
+            message: "删除成功",
+            type: "success",
+          });
+          this.getItemList();
+        });
+      } else {
+        this.$message({
+          message: "请勾选项目",
+          type: "error",
+        });
+      }
+    },
     //获取项目列表
     getItemList() {
       this.$get("/sp/project/list", {
@@ -1347,5 +1433,9 @@ export default {
 .active {
   border: none;
   background-color: #f56c6c;
+}
+.minwidth{
+  width : 100%;
+  min-width: 1000px;
 }
 </style>

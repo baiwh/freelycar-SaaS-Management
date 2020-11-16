@@ -1,9 +1,12 @@
 import axios from 'axios'
 import {Message} from 'element-ui'
 
+var api = "/test";
+// var api = "/api";
+
 export function get(url, params = {}) {
   return new Promise((resolve, reject) => {
-    axios.get('/api' + url, {
+    axios.get(api + url, {
       params: params
     })
       .then(response => {
@@ -21,7 +24,7 @@ export function get(url, params = {}) {
 
 export function post(url, data = {}) {
   return new Promise((resolve, reject) => {
-    axios.post('/api' + url, data)
+    axios.post(api + url, data)
       .then(response => {
         if (response.data.code === 1 || response.data.status === 0) {
           if (response.data.result) {
@@ -43,7 +46,7 @@ export function post(url, data = {}) {
 }
 export function getExcel(url, params = {}) {
   return new Promise((resolve, reject) => {
-    axios.get('/api' + url, {
+    axios.get(api+ url, {
       params: params,
       responseType: 'blob',
     })
@@ -67,7 +70,7 @@ export function getExcel(url, params = {}) {
 
 export function postExcel(url, data = {}) {
   return new Promise((resolve, reject) => {
-    axios.post('/api' + url, data, {responseType: 'blob'})
+    axios.post(api + url, data, {responseType: 'blob'})
       .then(res => {
         if (!res) {
           return

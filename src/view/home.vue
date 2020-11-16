@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="minwidth">
     <div class="page-center">数据统计</div>
     <el-row :gutter="5">
-      <el-col :span="6">
+      <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6">
         <span>所属网点：</span>
         <el-select
           clearable
@@ -16,7 +16,7 @@
         </el-select>
       </el-col>
 
-      <el-col :span="8">
+      <el-col :xs="9" :sm="9" :md="9" :lg="9" :xl="9">
         <span>查找日期：</span>
         <el-date-picker
           v-model="datePickerValue"
@@ -26,7 +26,7 @@
           placeholder="选择日期"
         ></el-date-picker>
       </el-col>
-      <el-col :span="5">
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         <el-button type="primary" @click="getList" size="small">查询</el-button>
       </el-col>
     </el-row>
@@ -122,7 +122,7 @@ export default {
             {
               type: "value",
               position: "left",
-              name:"注\n册\n人\n数\n︵\n次\n︶",
+              name:"注\n册\n人\n数\n︵\n个\n︶",
               nameLocation:"center",
               nameGap:35,
               nameRotate:0,
@@ -191,6 +191,11 @@ export default {
   width: 300px;
   text-align: center;
   margin: 5px 0 10px 0;
+
+}
+.minwidth{
+  width : 100%;
+  min-width: 1000px;
 }
 .container {
   width: 100%;

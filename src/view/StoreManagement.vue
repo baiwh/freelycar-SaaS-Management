@@ -1,13 +1,13 @@
 <template>
-  <div>
+  <div class="minwidth">
     <!--查询条件-->
     <el-row>
-      <el-col :span="10">
+      <el-col :span="8">
         网点名称：
         <el-input v-model="storeName" size="small" style="width: 16vw"></el-input>
       </el-col>
       <el-col :span="3">
-        <el-button type="primary" size="small" @click="getList">查询</el-button>
+        <el-button type="primary" size="small" @click="getList('select')">查询</el-button>
       </el-col>
     </el-row>
 
@@ -120,7 +120,7 @@
           <el-input v-model="storeInfo.username" style="width: 80%" size="small"></el-input>
         </el-form-item>
         <el-form-item label="密码：" prop="password">
-          <el-input v-model="storeInfo.password" style="width: 80%" size="small"></el-input>
+          <el-input v-model="storeInfo.password" style="width: 80%" size="small" ></el-input>
         </el-form-item>
         <el-form-item label="备注：" prop="remark">
           <el-input
@@ -144,6 +144,16 @@
 export default {
   name: "StoreManagement",
   data() {
+    var checkData=(rule, value, callback) =>{
+      if (value) {
+        if (/[^\w\.\/]/ig.test(value)) {
+          callback(new Error('请不要输入中文和空格！'));
+        } else {
+          callback();
+        }
+      }
+      callback();
+    }
     return {
       loading: "",
       storeName: "",
@@ -152,7 +162,7 @@ export default {
         name: [{ required: true, message: "请输入名称", trigger: "change" }],
         address: [{ required: true, message: "请输入地址", trigger: "blur" }],
         username:[{required:true,message:"请输入账号名称",trigger:"blur"}],
-        password:[{required:true,message:"请输入密码",trigger:"blur"}]
+        password:[{required:true,message:"请输入密码",trigger:"blur"},{ validator: checkData, trigger: 'blur'}]
       },
       pageData: {
         currentPage: 1,
@@ -175,7 +185,11 @@ export default {
   },
   methods: {
     // 获取网点列表
-    getList() {
+    getList(info) {
+      if(info == 'select'){
+        this.pageData.currentPage =1;
+        this.pageData.pageSize=10;
+      }
       this.$get("/store/listStoreAccount", {
         name: this.storeName,
         currentPage: this.pageData.currentPage,
@@ -263,7 +277,7 @@ export default {
     allDelete() {
       let ids = [];
       this.multipleSelection.forEach((v) => {
-        ids.push(v.id);
+        ids.push(v.storeId);
       });
       if (this.multipleSelection.length > 0) {
         this.$post("/store/batchDelete", {
@@ -295,7 +309,7 @@ export default {
         let param = {};
         let prestore;
         console.log(index)
-        this.$get("/store/list", {
+        this.$get("/store/listStoreAccount", {
           name: this.storeName,
           currentPage: this.pageData.currentPage-1,
           pageSize: this.pageData.pageSize,
@@ -326,11 +340,12 @@ export default {
       if (index === this.storeList.length - 1 && index+(this.pageData.currentPage - 1) * this.pageData.pageSize + 1 !==this.pageData.pageTotal) {
         let param = {};
         let nextstore;
-        this.$get("/store/list", {
+        this.$get("/store/listStoreAccount", {
           name: this.storeName,
           currentPage: this.pageData.currentPage+1,
           pageSize: this.pageData.pageSize,
       }).then((res) => {
+        console.log(res)
         nextstore = res.data[0];
         param[row.storeId] = nextstore.sort;
         param[nextstore.storeId] = row.sort;
@@ -401,5 +416,9 @@ export default {
 .active{
   border:none;
   background-color:#f56c6c;
+}
+.minwidth{
+  width : 100%;
+  min-width: 1000px;
 }
 </style>
