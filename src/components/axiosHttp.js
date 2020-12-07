@@ -11,7 +11,7 @@ export function get(url, params = {}) {
     })
       .then(response => {
         if (response.data.code === 1) {
-          resolve(response.data.data)
+           (response.data.data)
         } else {
           Message.error(response.data.msg)
         }
