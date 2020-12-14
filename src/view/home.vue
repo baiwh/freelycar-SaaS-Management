@@ -34,7 +34,7 @@
     <el-table v-loading="loading" :data="dataList">
       <el-table-column property="cumulateUserCount" :label="newyesterdayFlag"
                         align="center"/>
-      <el-table-column property="registerUserCount" label="注册人数" align="center"/>
+      <el-table-column property="registerUserCount" label="总注册人数" align="center"/>
       <el-table-column property="orderCount" label="订单数" align="center"/>
     </el-table>
   </div>
@@ -64,6 +64,7 @@
           this.loading=false
           let list = [res]
           this.dataList = list
+          console.log(res)
           this.yesterdayFlag=this.dataList[0].yesterdayFlag
         })
       },
