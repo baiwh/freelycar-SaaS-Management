@@ -149,6 +149,7 @@
           currentPage: this.pageData.currentPage,
           pageSize: this.pageData.pageSize
         }).then(res => {
+          console.log(res)
           this.loading = false
           this.cabinetList = res.data
           this.pageData.currentPage = res.currentPage

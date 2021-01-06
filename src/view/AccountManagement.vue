@@ -166,6 +166,7 @@
           currentPage: this.pageData.currentPage,
           pageSize: this.pageData.pageSize
         }).then(res => {
+          console.log(res)
           this.loading = false
           this.accountList = res.data
           this.pageData.currentPage = res.currentPage
