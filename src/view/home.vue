@@ -100,7 +100,7 @@ export default {
         }
         myChart.setOption({
           title: {
-            text: '所有门店每月注册和订单数',
+            text: '所有网点每月注册和订单数',
         },
         tooltip : {
             trigger: 'item',
@@ -164,7 +164,7 @@ export default {
   },
   computed: {
     newyesterdayFlag: function () {
-      return this.yesterdayFlag ? "当日关注人数" : "昨日关注人数";
+      return this.yesterdayFlag ? "昨日关注人数" : "当日关注人数";
     },
   },
   mounted: function () {

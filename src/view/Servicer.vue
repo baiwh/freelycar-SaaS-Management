@@ -353,7 +353,7 @@
             <el-table-column align="center" label="排序">
               <template slot-scope="scope">
                 <el-button
-                  :disabled="scope.row.sort === 10"
+                  :disabled="scope.$index ==0 && itemPageData.currentPage ==1"
                   size="mini"
                   type="primary"
                   @click="upLayer(scope.$index, scope.row)"
@@ -676,11 +676,14 @@
             <el-select
               v-model="technicianserviceStore"
               multiple
+              collapse-tags
               placeholder="请选择或输入查找"
               style="width: 27vw"
               size="small"
               value-key="id"
+              @change='changeSelect' @remove-tag='removeTag'
             >
+              <el-option label='全选' value='全选' @click.native='selectAll'></el-option>
               <el-option
                 v-for="item in serviceStoreSelectList"
                 :key="item.id"
@@ -1126,6 +1129,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           //stores数据处理
+          console.log(this.technicianserviceStore)
           var stores = [];
           for (var i in this.technicianserviceStore) {
             stores.push({ id: this.technicianserviceStore[i] });
@@ -1151,6 +1155,33 @@ export default {
           });
         }
       });
+    },
+
+    //技师网点全选
+    selectAll() {
+      if (this.technicianserviceStore.length < this.serviceStoreSelectList.length) {
+        this.technicianserviceStore = []
+        this.serviceStoreSelectList.map((item) => {
+          this.technicianserviceStore.push(item.id)
+        })
+        this.technicianserviceStore.unshift('全选')
+      } else {
+        this.technicianserviceStore = []
+      }
+    },
+    changeSelect(val) {
+      if (!val.includes('全选') && val.length === this.serviceStoreSelectList.length) {
+        this.technicianserviceStore.unshift('全选')
+      } else if (val.includes('全选') && (val.length - 1) < this.serviceStoreSelectList.length) {
+        this.technicianserviceStore = this.technicianserviceStore.filter((item) => {
+          return item !== '全选'
+        })
+      }
+    },
+    removeTag(val) {
+      if (val === '全选') {
+        this.technicianserviceStore = []
+      }
     },
     // 修改技师
     handleModifyTechnician(row) {
@@ -1371,7 +1402,7 @@ export default {
     //上移
     upLayer(index, row) {
       console.log(row);
-      if (row.sort === 10) {
+      if (index == 0 && this.itemPageData.currentPage ==1) {
         this.$message({
           message: "处于顶端，不能继续上移",
           type: "warning",

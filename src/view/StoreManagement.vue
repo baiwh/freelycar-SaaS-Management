@@ -6,6 +6,10 @@
         网点名称：
         <el-input v-model="storeName" size="small" style="width: 16vw"></el-input>
       </el-col>
+      <el-col :span="8">
+        物业名称：
+        <el-input v-model="propertyCompany" size="small" style="width: 16vw"></el-input>
+      </el-col>
       <el-col :span="3">
         <el-button type="primary" size="small" @click="getList('select')">查询</el-button>
       </el-col>
@@ -38,6 +42,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="name" label="网点名称" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="propertyCompany" label="所属物业" show-overflow-tooltip></el-table-column>
       <el-table-column prop="address" label="地址"></el-table-column>
       <el-table-column prop="username" label="账号名称" width="85"></el-table-column>
       <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
@@ -66,7 +71,7 @@
       <el-table-column align="center" label="排序" width="170">
         <template slot-scope="scope">
           <el-button
-            :disabled="scope.row.sort===10"
+            :disabled="scope.$index ==0 && pageData.currentPage ==1"
             size="mini"
             type="primary"
             @click="upLayer(scope.$index,scope.row)"
@@ -111,6 +116,9 @@
       >
         <el-form-item label="网点名称：" prop="name">
           <el-input v-model="storeInfo.name" style="width: 80%" size="small"></el-input>
+        </el-form-item>
+        <el-form-item label="所属物业：" prop="propertyCompany">
+          <el-input v-model="storeInfo.propertyCompany" style="width: 80%" size="small"></el-input>
         </el-form-item>
         <el-form-item label="网点地址：" prop="address">
           <el-input v-model="storeInfo.address" style="width: 80%" size="small"></el-input>
@@ -162,6 +170,7 @@ export default {
         name: [{ required: true, message: "请输入名称", trigger: "change" }],
         address: [{ required: true, message: "请输入地址", trigger: "blur" }],
         username:[{required:true,message:"请输入账号名称",trigger:"blur"}],
+        propertyCompany:[{required:true,message:"请输入物业",trigger:"blur"}],
         password:[{required:true,message:"请输入密码",trigger:"blur"},{ validator: checkData, trigger: 'blur'}]
       },
       pageData: {
@@ -176,16 +185,19 @@ export default {
         phone: "",
         remark: "",
         sysUserId:"",
+        propertyCompany:"",
       },
       multipleSelection: [],
       newOrChange: "",
       isShow: false,
       show: false,
+      propertyCompany:""
     }
   },
   methods: {
     // 获取网点列表
     getList(info) {
+      console.log(info)
       if(info == 'select'){
         this.pageData.currentPage =1;
         this.pageData.pageSize=10;
@@ -194,7 +206,9 @@ export default {
         name: this.storeName,
         currentPage: this.pageData.currentPage,
         pageSize: this.pageData.pageSize,
+        propertyCompany: this.propertyCompany,
       }).then((res) => {
+        console.log('1111')
         console.log(res);
         this.loading = false;
         this.storeList = res.data;
@@ -239,7 +253,8 @@ export default {
             remark: this.storeInfo.remark,
             username: this.storeInfo.username,
             password: this.storeInfo.password,
-            sysUserId:this.storeInfo.sysUserId
+            sysUserId:this.storeInfo.sysUserId,
+            propertyCompany:this.storeInfo.propertyCompany,
           }).then((res) => {
             console.log(res)
             this.$message({
