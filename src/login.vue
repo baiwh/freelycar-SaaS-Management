@@ -78,7 +78,9 @@
                 let nowTime = time.getTime()
                 time.setTime(nowTime + 5 * 24 * 60 * 60 * 1000)
                 document.cookie = "jwtSuperAdmin=" + res + "; expires=" + time.toGMTString() + ";path=/"
-              }
+              }else{
+              document.cookie = "jwtSuperAdmin="+res+";path=/";
+            }
               this.$router.push('/home')
             }
           })

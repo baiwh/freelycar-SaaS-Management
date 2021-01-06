@@ -1,13 +1,17 @@
 <template>
-  <div>
+  <div class="minwidth">
     <!--查询条件-->
     <el-row>
-      <el-col :span="10">
+      <el-col :span="8">
         网点名称：
         <el-input v-model="storeName" size="small" style="width: 16vw"></el-input>
       </el-col>
+      <el-col :span="8">
+        物业名称：
+        <el-input v-model="propertyCompany" size="small" style="width: 16vw"></el-input>
+      </el-col>
       <el-col :span="3">
-        <el-button type="primary" size="small" @click="getList">查询</el-button>
+        <el-button type="primary" size="small" @click="getList('select')">查询</el-button>
       </el-col>
     </el-row>
 
@@ -38,19 +42,20 @@
         </template>
       </el-table-column>
       <el-table-column prop="name" label="网点名称" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="propertyCompany" label="所属物业" show-overflow-tooltip></el-table-column>
       <el-table-column prop="address" label="地址"></el-table-column>
       <el-table-column prop="username" label="账号名称" width="85"></el-table-column>
       <el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
       <el-table-column align="center" label="删除" width="85">
         <template slot-scope="scope">
-          <el-popover placement="top" width="160" :ref="scope.row.id">
+          <el-popover placement="top" width="160" :ref="scope.row.storeId">
             <p>确定删除此网点？</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="handleClose(scope.row.id)">取消</el-button>
+              <el-button size="mini" type="text" @click="handleClose(scope.row.storeId)">取消</el-button>
               <el-button type="primary" size="mini" @click="handleDelete(scope.row)">确定</el-button>
             </div>
           </el-popover>
-          <el-button size="mini" v-popover="scope.row.id" type="danger">删除</el-button>
+          <el-button size="mini" v-popover="scope.row.storeId" type="danger">删除</el-button>
         </template>
       </el-table-column>
       <el-table-column align="center" label="修改" width="85">
@@ -60,13 +65,13 @@
       </el-table-column>
       <el-table-column align="center" label="账号" width="85">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="closeAccount(scope.row)">关闭</el-button>
+          <el-button size="mini" type="primary" :class="{'active':scope.row.openStatus}" @click="closeOrOpenAccount(scope.row)">{{scope.row.openStatus==true?"关闭":"开启"}}</el-button>
         </template>
       </el-table-column>
       <el-table-column align="center" label="排序" width="170">
         <template slot-scope="scope">
           <el-button
-            :disabled="scope.row.sort===10"
+            :disabled="scope.$index ==0 && pageData.currentPage ==1"
             size="mini"
             type="primary"
             @click="upLayer(scope.$index,scope.row)"
@@ -112,6 +117,9 @@
         <el-form-item label="网点名称：" prop="name">
           <el-input v-model="storeInfo.name" style="width: 80%" size="small"></el-input>
         </el-form-item>
+        <el-form-item label="所属物业：" prop="propertyCompany">
+          <el-input v-model="storeInfo.propertyCompany" style="width: 80%" size="small"></el-input>
+        </el-form-item>
         <el-form-item label="网点地址：" prop="address">
           <el-input v-model="storeInfo.address" style="width: 80%" size="small"></el-input>
         </el-form-item>
@@ -120,7 +128,7 @@
           <el-input v-model="storeInfo.username" style="width: 80%" size="small"></el-input>
         </el-form-item>
         <el-form-item label="密码：" prop="password">
-          <el-input v-model="storeInfo.password" style="width: 80%" size="small"></el-input>
+          <el-input v-model="storeInfo.password" style="width: 80%" size="small" ></el-input>
         </el-form-item>
         <el-form-item label="备注：" prop="remark">
           <el-input
@@ -144,6 +152,16 @@
 export default {
   name: "StoreManagement",
   data() {
+    var checkData=(rule, value, callback) =>{
+      if (value) {
+        if (/[^\w\.\/]/ig.test(value)) {
+          callback(new Error('请不要输入中文和空格！'));
+        } else {
+          callback();
+        }
+      }
+      callback();
+    }
     return {
       loading: "",
       storeName: "",
@@ -152,7 +170,8 @@ export default {
         name: [{ required: true, message: "请输入名称", trigger: "change" }],
         address: [{ required: true, message: "请输入地址", trigger: "blur" }],
         username:[{required:true,message:"请输入账号名称",trigger:"blur"}],
-        password:[{required:true,message:"请输入密码",trigger:"blur"}]
+        propertyCompany:[{required:true,message:"请输入物业",trigger:"blur"}],
+        password:[{required:true,message:"请输入密码",trigger:"blur"},{ validator: checkData, trigger: 'blur'}]
       },
       pageData: {
         currentPage: 1,
@@ -160,31 +179,40 @@ export default {
         pageTotal: 100,
       },
       storeInfo: {
-        id: "",
+        storeId: "",
         name: "",
         address: "",
-        linkman: "",
         phone: "",
         remark: "",
+        sysUserId:"",
+        propertyCompany:"",
       },
       multipleSelection: [],
       newOrChange: "",
       isShow: false,
       show: false,
+      propertyCompany:""
     }
   },
   methods: {
     // 获取网点列表
-    getList() {
-      this.$get("/store/list", {
+    getList(info) {
+      console.log(info)
+      if(info == 'select'){
+        this.pageData.currentPage =1;
+        this.pageData.pageSize=10;
+      }
+      this.$get("/store/listStoreAccount", {
         name: this.storeName,
         currentPage: this.pageData.currentPage,
         pageSize: this.pageData.pageSize,
+        propertyCompany: this.propertyCompany,
       }).then((res) => {
+        console.log('1111')
         console.log(res);
         this.loading = false;
         this.storeList = res.data;
-        
+        console.log(res)
         this.pageData.currentPage = res.currentPage;
         this.pageData.pageSize = res.pageSize;
         this.pageData.pageTotal = res.total;
@@ -196,10 +224,9 @@ export default {
       this.isShow = true;
       this.newOrChange = "新增网点";
       this.storeInfo = {
-        id: "",
+        storeId: "",
         name: "",
         address: "",
-        linkman: "",
         phone: "",
         remark: "",
       };
@@ -207,6 +234,7 @@ export default {
 
     // 修改网点模态框
     handleModify(row) {
+      console.log(row)
       this.isShow = true;
       this.newOrChange = "修改网点";
       this.storeInfo = { ...row };
@@ -214,17 +242,21 @@ export default {
 
     // 提交新增、修改
     storeSubmit(formName) {
+      console.log('11')
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.isShow = false;
           this.$post("/store/modify", {
-            id: this.storeInfo.id,
+            storeId: this.storeInfo.storeId,
             name: this.storeInfo.name,
             address: this.storeInfo.address,
-            linkman: this.storeInfo.linkman,
-            phone: this.storeInfo.phone,
             remark: this.storeInfo.remark,
+            username: this.storeInfo.username,
+            password: this.storeInfo.password,
+            sysUserId:this.storeInfo.sysUserId,
+            propertyCompany:this.storeInfo.propertyCompany,
           }).then((res) => {
+            console.log(res)
             this.$message({
               message: "提交成功",
               type: "success",
@@ -246,7 +278,7 @@ export default {
     // 删除单个网点
     handleDelete(row) {
       this.$get("/store/delete", {
-        id: row.id,
+        id: row.storeId,
       }).then((res) => {
         this.$message({
           message: "删除成功",
@@ -260,7 +292,7 @@ export default {
     allDelete() {
       let ids = [];
       this.multipleSelection.forEach((v) => {
-        ids.push(v.id);
+        ids.push(v.storeId);
       });
       if (this.multipleSelection.length > 0) {
         this.$post("/store/batchDelete", {
@@ -287,18 +319,20 @@ export default {
 
     // 上移
     upLayer(index, row) {
+      console.log(row)
       if (index == 0 && row.sort!== 10) {
         let param = {};
         let prestore;
-        this.$get("/store/list", {
+        console.log(index)
+        this.$get("/store/listStoreAccount", {
           name: this.storeName,
           currentPage: this.pageData.currentPage-1,
           pageSize: this.pageData.pageSize,
       }).then((res) => {
-        // console.log(res)
+        console.log(res)
         prestore = res.data[9];
-        param[row.id] = prestore.sort;
-        param[prestore.id] = row.sort;
+        param[row.storeId] = prestore.sort;
+        param[prestore.storeId] = row.sort;
         this.switchLocation(param);
 
       });
@@ -308,8 +342,9 @@ export default {
           type: "warning",});
       } else {
         let param = {};
-        param[row.id] = this.storeList[index - 1].sort; //该行的网点id和sort
-        param[this.storeList[index - 1].id] = row.sort; //上一行数据的sort
+        param[row.storeId] = this.storeList[index - 1].sort; //该行的网点id和sort
+        param[this.storeList[index - 1].storeId] = row.sort; //上一行数据的sort
+        console.log(param)
         //访问后台接口传入两个调换的网点id和sort值有后台调换顺序，刷新数据
         this.switchLocation(param);
       }
@@ -320,14 +355,15 @@ export default {
       if (index === this.storeList.length - 1 && index+(this.pageData.currentPage - 1) * this.pageData.pageSize + 1 !==this.pageData.pageTotal) {
         let param = {};
         let nextstore;
-        this.$get("/store/list", {
+        this.$get("/store/listStoreAccount", {
           name: this.storeName,
           currentPage: this.pageData.currentPage+1,
           pageSize: this.pageData.pageSize,
       }).then((res) => {
+        console.log(res)
         nextstore = res.data[0];
-        param[row.id] = nextstore.sort;
-        param[nextstore.id] = row.sort;
+        param[row.storeId] = nextstore.sort;
+        param[nextstore.storeId] = row.sort;
         this.switchLocation(param);
 
       });
@@ -337,13 +373,14 @@ export default {
           type: "warning",});
       } else {
         let param = {};
-        param[row.id] = this.storeList[index + 1].sort; //该行的网点id和下一行的sort
-        param[this.storeList[index + 1].id] = row.sort; //上一行数据的sort
+        param[row.storeId] = this.storeList[index + 1].sort; //该行的网点id和下一行的sort
+        param[this.storeList[index + 1].storeId] = row.sort; //上一行数据的sort
         this.switchLocation(param);
       }
     },
     //移动请求
     switchLocation(param) {
+      console.log('移动')
       this.$post("/store/switchLocation", param).then((res) => {
         this.$message({
           message: "移动成功",
@@ -352,6 +389,34 @@ export default {
         this.getList();
       });
     },
+    closeOrOpenAccount(row){
+      //关闭账号
+      console.log(row.openStatus);
+      console.log(row.sysUserId)
+      if(row.openStatus){
+        this.$get("/sysUser/close",{
+          id:row.sysUserId
+        }).then((res)=>{
+          console.log(res)
+          this.getList();
+          this.$message({
+            message:"关闭成功",
+            type:"success",
+          });
+        })
+      }else{
+        this.$get("/sysUser/open",{
+          id:row.sysUserId
+        }).then((res)=>{
+          console.log(res)
+          this.getList();
+          this.$message({
+            message:"开启成功",
+            type:"success",
+          });
+        })
+      }
+    }
   },
   mounted: function () {
     this.getList();
@@ -362,5 +427,13 @@ export default {
 <style lang="less" scoped>
 .el-row {
   margin-bottom: 30px;
+}
+.active{
+  border:none;
+  background-color:#f56c6c;
+}
+.minwidth{
+  width : 100%;
+  min-width: 1000px;
 }
 </style>

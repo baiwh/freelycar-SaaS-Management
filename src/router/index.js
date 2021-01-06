@@ -10,7 +10,8 @@ import StatisticalReportForms from '@/router/StatisticalReportForms'
 import StoreManagement from '@/view/StoreManagement'
 import Servicer from '@/view/Servicer'
 // 账号管理
-import AccountManagement from '@/view/AccountManagement'
+// import AccountManagement from '@/view/AccountManagement'
+
 import cooperation from '@/view/cooperation'
 
 // 统计报表
@@ -46,16 +47,8 @@ export default new Router({
           path: 'StoreManagement',
           name: '网点管理',
           component: StoreManagement
-        },{
-          path: 'cooperation',
-          name: '网点管理',
-          component: cooperation
         },
         {
-          path: 'AccountManagement',
-          name: '账号管理',
-          component: AccountManagement
-        },{
           path: 'Servicer',
           name: '服务商管理',
           component: Servicer
@@ -81,6 +74,11 @@ export default new Router({
           path: 'IntelligentCabinet',
           name: '智能柜管理',
           component: IntelligentCabinet
+        },
+        {
+          path: 'cooperation',
+          name: '合作宣传',
+          component: cooperation
         },
         {
           path: 'ActivityPropaganda',

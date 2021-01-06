@@ -4,7 +4,7 @@
     <el-row :gutter="5">
       <el-col :span="9">
         <span>所属网点：</span>
-        <el-select filterable clearable v-model="selectStore" placeholder="请选择或输入" style="width: 16vw" size="small">
+        <el-select clearable v-model="selectStore" placeholder="请选择" style="width: 16vw" size="small">
           <el-option v-for="item in storeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-col>
@@ -56,7 +56,7 @@
     <el-dialog :title="newOrChange" :visible.sync="isShow">
       <el-form :model="accountInfo" :rules="rules" ref="accountInfo" label-width="100px" class="demo-ruleForm">
         <el-form-item label="所属网点" prop="storeId">
-          <el-select filterable v-model="accountInfo.storeId" placeholder="请选择或输入" style="width: 80%">
+          <el-select v-model="accountInfo.storeId" placeholder="请选择" style="width: 80%">
             <el-option v-for="item in storeList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>

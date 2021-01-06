@@ -2,35 +2,186 @@
   <div>
     <!-- 选择类别 -->
     <el-row :gutter="5">
-      <el-col :span="6">
-        <el-radio-group v-model="tabItemPosition" size="small">
+      <el-col :span="5">
+        <el-radio-group v-model="tabItemPosition" size="small" @change="changePosition">
           <el-radio-button label="time">时间</el-radio-button>
           <el-radio-button label="service">服务商</el-radio-button>
           <el-radio-button label="store">网点</el-radio-button>
         </el-radio-group>
       </el-col>
-      <el-col :span="11" v-show="tabItemPosition=='time'">
+      <el-col :span="14" v-show="tabItemPosition == 'time'">
         <span>查找日期：</span>
-        <el-date-picker v-model="fileYear" type="year" placeholder="选择查找的年份" value-format="yyyy"></el-date-picker>
-        <el-button type="primary" @click="searchData" size="small">查询</el-button>
+        <el-date-picker
+          v-model="fileYear"
+          type="year"
+          placeholder="选择查找的年份"
+          value-format="yyyy"
+        ></el-date-picker>
+        <el-button type="primary" @click="searchData" size="small"
+          >查询</el-button
+        >
+        <el-button type="primary" @click="importData" size="small"
+          >导出Excel</el-button
+        >
+
+      </el-col>
+      <el-col :span="10" v-show="tabItemPosition == 'service'">
+        <span>服务商</span>
+        <el-select
+          filterable
+          v-model="rspId"
+          clearable
+          placeholder="请选择或输入查找"
+          style="width: 10vw"
+          size="small"
+          @change="changeService($event)"
+        >
+          <el-option
+            v-for="(item,index) in ServiceList"
+            :key="item.id"
+            :label="item.name"
+            :value="index"
+          ></el-option>
+        </el-select>
+        <el-radio-group
+          v-model="tabTimePosition"
+          @change="onServiceChange"
+          size="small"
+        >
+          <el-radio-button label="today">今日</el-radio-button>
+          <el-radio-button label="thisMonth">本月</el-radio-button>
+          <el-radio-button label="search">区间查找</el-radio-button>
+        </el-radio-group>
+      </el-col>
+      <el-col :span="10" v-show="tabItemPosition == 'store'">
+        <span>所属网点</span>
+        <el-select
+          filterable
+          v-model="storeId"
+          clearable
+          placeholder="请选择或输入查找"
+          style="width: 10vw"
+          size="small"
+          @change="changeStore($event)"
+        >
+          <el-option
+            v-for="(item,index) in StoreList"
+            :key="item.id"
+            :label="item.name"
+            :value="index"
+          ></el-option>
+        </el-select>
+        <el-radio-group
+          v-model="tabTimePosition"
+          @change="onButtonChange"
+          size="small"
+        >
+          <el-radio-button label="today">今日</el-radio-button>
+          <el-radio-button label="thisMonth">本月</el-radio-button>
+          <el-radio-button label="search">区间查找</el-radio-button>
+        </el-radio-group>
+      </el-col>
+      <el-col
+        :span="8"
+        v-show="
+          tabTimePosition == 'search' &&
+          (tabItemPosition == 'service' || tabItemPosition == 'store')
+        "
+      >
+        <span>日期</span>
+        <el-date-picker
+          v-model="datePickerValue"
+          type="daterange"
+          range-separator="~"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd"
+          style="width: 10vw"
+          size="small"
+        >
+        </el-date-picker>
+        <el-button
+          v-show="tabItemPosition == 'service'"
+          type="primary"
+          @click="timeService"
+          size="small"
+          >查询</el-button
+        >
+        <el-button
+          v-show="tabItemPosition == 'store'"
+          type="primary"
+          @click="timeStore"
+          size="small"
+          >查询</el-button
+        >
       </el-col>
     </el-row>
     <el-row :gutter="20">
       <el-col :span="8">
-        <span style="fontSize:26px">总营业额：130000</span>
+        <span style="fontsize: 26px">总营业额：{{ sum }}元</span>
       </el-col>
     </el-row>
-    <el-row v-show="tabItemPosition=='time'">
+    <!-- 时间 -->
+    <el-row v-show="tabItemPosition == 'time'">
       <div class="echarts-box" id="echarts"></div>
     </el-row>
-    <el-row v-show="tabItemPosition=='time'">
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column fixed prop="item" label="日期" width="100"></el-table-column>
-        <el-table-column v-for="(item,index) in month" :key="index"  prop="price" :label="item" >
+    <el-row v-show="tabItemPosition == 'time'">
+      <el-table :data="tableData" border style="width: 96%">
+        <el-table-column
+          fixed
+          prop="item"
+          label="日期"
+          width="94"
+        ></el-table-column>
+        <el-table-column
+          v-for="(item, index) in month"
+          :key="index"
+          prop="price"
+          width="72"
+          :label="item"
+        >
           <template slot-scope="scope">
-            <span>{{scope.row.price[index]}}</span>
+            <span>{{ scope.row.num[index] }}</span>
           </template>
         </el-table-column>
+      </el-table>
+    </el-row>
+
+    <!-- 服务商 -->
+    <el-row v-show="tabItemPosition == 'service'">
+      <div class="service-echart" id="servicerEcharts"></div>
+    </el-row>
+    <el-row v-show="tabItemPosition == 'service' && !service">
+      <el-table :data="servicerList" border style="width: 93%">
+        <el-table-column prop="0" label="服务商名称"></el-table-column>
+        <el-table-column prop="1" label="营业额"></el-table-column>
+        <el-table-column prop="2" label="占比"></el-table-column>
+      </el-table>
+    </el-row>
+    <el-row v-show="tabItemPosition == 'service' && service ">
+      <el-table :data="servicerList" border style="width: 93%">
+        <el-table-column prop="0" label="网点名称"></el-table-column>
+        <el-table-column prop="1" label="营业额"></el-table-column>
+        <el-table-column prop="2" label="占比"></el-table-column>
+      </el-table>
+    </el-row>
+    <!-- 网点 -->
+    <el-row v-show="tabItemPosition == 'store'">
+      <div class="store-echart" id="storeEcharts"></div>
+    </el-row>
+    <el-row v-show="tabItemPosition == 'store' && !store ">
+      <el-table :data="storeList" border style="width: 93%">
+        <el-table-column prop="0" label="网点名称"></el-table-column>
+        <el-table-column prop="1" label="营业额"></el-table-column>
+        <el-table-column prop="2" label="占比"></el-table-column>
+      </el-table>
+    </el-row>
+    <el-row v-show="tabItemPosition == 'store' && store ">
+      <el-table :data="storeList" border style="width: 93%">
+        <el-table-column prop="0" label="项目名称"></el-table-column>
+        <el-table-column prop="1" label="所属服务商"></el-table-column>
+        <el-table-column prop="2" label="营业额"></el-table-column>
+        <el-table-column prop="3" label="占比"></el-table-column>
       </el-table>
     </el-row>
   </div>
@@ -46,69 +197,51 @@ export default {
       tabItemPosition: "time",
       fileYear: "",
       option: {},
-      tableData: [{
-          item: '营业额',
-          price: [
-          2.0,
-          4.9,
-          7.0,
-          23.2,
-          25.6,
-          76.7,
-          135.6,
-          162.2,
-          32.6,
-          20.0,
-          6.4,
-          3.3,
-        ],
-        }, {
-          item: '同比增长率',
-          price: [
-          2.6,
-          5.9,
-          9.0,
-          26.4,
-          28.7,
-          70.7,
-          175.6,
-          182.2,
-          48.7,
-          18.8,
-          6.0,
-          2.3,
-        ],
-        }, {
-          item: '环比增长率',
-          price: [
-          2.0,
-          2.2,
-          3.3,
-          4.5,
-          6.3,
-          10.2,
-          20.3,
-          23.4,
-          23.0,
-          16.5,
-          12.0,
-          6.2,
-        ]
-        }],
-        month: [
-              "1月",
-              "2月",
-              "3月",
-              "4月",
-              "5月",
-              "6月",
-              "7月",
-              "8月",
-              "9月",
-              "10月",
-              "11月",
-              "12月",
-            ],
+      tableData: [
+        {
+          item: "营业额",
+          num: [],
+        },
+        {
+          item: "同比增长率",
+          num: [],
+        },
+        {
+          item: "环比增长率",
+          num: [],
+        },
+      ],
+      month: [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月",
+      ],
+      servicerList: [],
+      servicerid: "",
+      ServiceList: "",
+      servicerOption: "",
+      tabTimePosition: "today",
+      datePickerValue: "",
+      visible: false,
+      storeList: [],
+      StoreList: "",
+      storeOption: "",
+      sum: "",
+      storeId: "",
+      startTime: "",
+      endTime: "",
+      store:null,
+      rspId:'',
+      service:null
     };
   },
   methods: {
@@ -146,163 +279,372 @@ export default {
     },
 
     searchData() {
-      var data1 = [
-          2.0,
-          4.9,
-          7.0,
-          23.2,
-          25.6,
-          76.7,
-          135.6,
-          162.2,
-          32.6,
-          20.0,
-          6.4,
-          3.3,
-        ],
-        data2 = [
-          2.6,
-          5.9,
-          9.0,
-          26.4,
-          28.7,
-          70.7,
-          175.6,
-          182.2,
-          48.7,
-          18.8,
-          6.0,
-          2.3,
-        ],
-        data3 = [
-          2.0,
-          2.2,
-          3.3,
-          4.5,
-          6.3,
-          10.2,
-          20.3,
-          23.4,
-          23.0,
-          16.5,
-          12.0,
-          6.2,
-        ];
-      var Min1 = this.calMin([data1]),
-        Min2 = this.calMin([data2, data3]),
-        Max1 = this.calMax([data1]),
-        Max2 = this.calMax([data2, data3]);
+      var date = new Date();
+      var y = date.getFullYear(); //获取当前年份
+      //同比 环比 营业额 时间
+      var y2y = [],
+        m2m = [],
+        turnover = [],
+        time = [];
+      this.$get("/order/getIncomeByYear", {
+        year: this.fileYear == "" ? y : this.fileYear,
+      }).then((res) => {
+        console.log(res);
+        this.sum = res.sum;
+        for (var i in res) {
+          let index = res[i].length - 1;
+          if (i == "Y2Y") {
+            for (var j in res[i]) {
+              y2y.push(res[i][index - j][1]);
+            }
+            this.tableData[1].num = y2y;
+          }
+          if (i == "M2M") {
+            for (var k in res[i]) {
+              m2m.push(res[i][index - k][1]);
+            }
+            this.tableData[2].num = m2m;
+          }
+          if (i == "year") {
+            for (var s in res[i]) {
+              turnover.push(res[i][index - s][1]);
+              time.push(res[i][index - s][0]);
+            }
+            this.tableData[0].num = turnover;
+          }
+        }
+        var Min1 = this.calMin([turnover]),
+          Min2 = this.calMin([y2y, m2m]),
+          Max1 = this.calMax([turnover]),
+          Max2 = this.calMax([y2y, m2m]);
 
-      this.option = {
+        this.option = {
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              type: "cross",
+              crossStyle: {
+                color: "#999",
+              },
+            },
+          },
+          toolbox: {
+            feature: {
+              dataView: { show: true, readOnly: false },
+              magicType: { show: true, type: ["line", "bar"] },
+              restore: { show: true },
+              saveAsImage: { show: true },
+            },
+          },
+          legend: {
+            data: ["营业额", "同比增长", "环比增长"],
+          },
+          xAxis: [
+            {
+              type: "category",
+              data: time,
+              axisPointer: {
+                type: "shadow",
+              },
+            },
+          ],
+          yAxis: [
+            {
+              type: "value",
+              name: "金额（元）",
+              min: Min1,
+              max: Max1,
+              splitNumber: 5,
+              interval: (Max1 - Min1) / 5,
+              axisLabel: {
+                formatter: "{value}",
+              },
+            },
+            {
+              type: "value",
+              name: "百分比",
+              min: Min2,
+              max: Max2,
+              splitNumber: 5,
+              interval: (Max2 - Min2) / 5,
+              axisLabel: {
+                formatter: "{value} %",
+              },
+            },
+          ],
+          series: [
+            {
+              name: "营业额",
+              type: "bar",
+              data: turnover,
+              itemStyle: {
+                normal: {
+                  color: "#409EFF",
+                },
+              },
+            },
+            {
+              name: "同比增长",
+              type: "line",
+              yAxisIndex: 1,
+              data: y2y,
+              itemStyle: {
+                normal: {
+                  color: "#778899",
+                },
+              },
+            },
+            {
+              name: "环比增长",
+              type: "line",
+              yAxisIndex: 1,
+              data: m2m,
+              itemStyle: {
+                normal: {
+                  color: "#F4A460",
+                },
+              },
+            },
+          ],
+        };
+        let myChart = echarts.init(document.getElementById("echarts"));
+        myChart.setOption(this.option);
+      });
+    },
+    changeService(e){
+      console.log(e);
+      this.service = this.ServiceList[e];
+      this.searchServicerData();
+    },
+    searchServicerData() {
+      this.$get("/order/getIncomeByRsp",{
+        rspId:this.service?this.service.id:'',
+        startTime:this.startTime,
+        endTime:this.endTime,
+      }).then((res)=>{
+        console.log(res)
+        var serviceList =[],
+        price = [];
+        this.sum = res.sum;
+        this.servicerList =res.list;
+        for(let i in res.list){
+          serviceList.push(res.list[i][0]);
+          price.push(res.list[i][1]);
+        }
+        let servicename = "服务商营业统计（元）";
+        if(this.service){
+          servicename=this.service.name+"各网点营业统计（元）";
+        }
+      this.servicerOption = {
+        title: {
+          text: servicename,
+        },
         tooltip: {
           trigger: "axis",
           axisPointer: {
-            type: "cross",
-            crossStyle: {
-              color: "#999",
-            },
+            type: "shadow",
           },
         },
-        toolbox: {
-          feature: {
-            dataView: { show: true, readOnly: false },
-            magicType: { show: true, type: ["line", "bar"] },
-            restore: { show: true },
-            saveAsImage: { show: true },
-          },
+        xAxis: {
+          type: "value",
+          boundaryGap: [0, 0.01],
         },
-        legend: {
-          data: ["营业额", "同比增长", "环比增长"],
+        yAxis: {
+          type: "category",
+          data: serviceList,
         },
-        xAxis: [
-          {
-            type: "category",
-            data: [
-              "1月",
-              "2月",
-              "3月",
-              "4月",
-              "5月",
-              "6月",
-              "7月",
-              "8月",
-              "9月",
-              "10月",
-              "11月",
-              "12月",
-            ],
-            axisPointer: {
-              type: "shadow",
-            },
-          },
-        ],
-        yAxis: [
-          {
-            type: "value",
-            name: "金额（元）",
-            min: Min1,
-            max: Max1,
-            splitNumber: 5,
-            interval: (Max1 - Min1) / 5,
-            axisLabel: {
-              formatter: "{value}",
-            },
-          },
-          {
-            type: "value",
-            name: "百分比",
-            min: Min2,
-            max: Max2,
-            splitNumber: 5,
-            interval: (Max2 - Min2) / 5,
-            axisLabel: {
-              formatter: "{value} %",
-            },
-          },
-        ],
         series: [
           {
             name: "营业额",
             type: "bar",
-            data: data1,
+            data: price,
+            barWidth: 30,
             itemStyle: {
               normal: {
                 color: "#409EFF",
               },
             },
           },
-          {
-            name: "同比增长",
-            type: "line",
-            yAxisIndex: 1,
-            data: data2,
-            itemStyle: {
-              normal: {
-                color: "#778899",
-              },
-            },
+        ],
+      };
+
+      let servicerChart = echarts.init(
+        document.getElementById("servicerEcharts")
+      );
+      servicerChart.setOption(this.servicerOption);
+    });
+    },
+    
+
+    onButtonChange(e) {
+      console.log(e);
+      if (e == "today") {
+        this.setToday();
+        this.searchStoreData();
+      }else if (e =='thisMonth'){
+        this.setMonth();
+        this.searchStoreData();
+      }
+    },
+    onServiceChange(e){
+      if (e == "today") {
+        this.setToday();
+        this.searchServicerData();
+      }else if (e =='thisMonth'){
+        this.setMonth();
+        this.searchServicerData();
+      }
+    },
+    changeStore(e){
+      // console.log(e)
+      this.store = this.StoreList[e];
+      this.searchStoreData();
+    },
+    changePosition(e){
+      console.log(e)
+      if(e == 'store'){
+        this.setToday();
+        this.searchStoreData();
+      }else if (e =="time"){
+        this.searchData();
+      }else if (e =="service"){
+        this.searchServicerData();
+      }
+    },
+    setToday(){
+      var date = new Date(),
+        Y = date.getFullYear() + "-",
+        M =
+          (date.getMonth() + 1 < 10
+            ? "0" + (date.getMonth() + 1)
+            : date.getMonth() + 1) + "-",
+        D = date.getDate();
+        this.startTime = Y + M + (D-1);
+        this.endTime = Y + M + D
+    },
+    setMonth(){
+      var date = new Date(),
+      Y = date.getFullYear() + "-",
+      M = (date.getMonth() + 1 < 10
+            ? "0" + (date.getMonth() + 1)
+            : date.getMonth() + 1) + "-",
+      D = '01';
+      this.startTime = Y+M+D;
+      this.endTime = '';
+    },
+    timeStore(){
+      console.log(this.datePickerValue)
+      this.startTime = this.datePickerValue[0];
+      this.endTime = this.datePickerValue[1];
+      this.searchStoreData();
+    },
+    timeService(){
+      this.startTime = this.datePickerValue[0];
+      this.endTime = this.datePickerValue[1];
+      this.searchServicerData();
+    },
+    searchStoreData() {
+      this.$get("/order/getIncomeByStore", {
+        storeId: this.store?this.store.id:'',
+        startTime: this.startTime,
+        endTime: this.endTime,
+      }).then((res) => {
+        console.log(res);
+        var storeList =[],
+        price = [],
+        proportion=[];
+        this.sum = res.sum;
+        this.storeList =res.list;
+        for(let i in res.list){
+          storeList.push(res.list[i][0]);
+          price.push(res.list[i][1]);
+          proportion.push(res.list[i][2]);
+        }
+        var text= "网点营业统计（元）";
+        console.log(this.store)
+      if(this.store){
+        text = this.store.name+"服务项目营业统计（元）";
+        storeList=[];
+        price=[];
+        proportion=[];
+        for(let i in res.list){
+          storeList.push(res.list[i][0]);
+          price.push(res.list[i][2]);
+          proportion.push(res.list[i][3])
+        }
+      }
+      this.storeOption = {
+        title: {
+          text: text,
+        },
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "shadow",
           },
+        },
+        xAxis: {
+          type: "value",
+          boundaryGap: false,
+        },
+        yAxis: {
+          type: "category",
+          data: storeList,
+        },
+        series: [
           {
-            name: "环比增长",
-            type: "line",
-            yAxisIndex: 1,
-            data: data3,
+            name: "营业额",
+            type: "bar",
+            data: price,
+            barWidth: 30,
             itemStyle: {
               normal: {
-                color: "#F4A460",
+                color: "#409EFF",
               },
             },
           },
         ],
       };
-      console.log(this.fileYear);
-      //通过年查找一整年的数据
-      let myChart = echarts.init(document.getElementById("echarts"));
-      myChart.setOption(this.option);
+      console.log("查询网点");
+      let storeEcharts = echarts.init(document.getElementById("storeEcharts"));
+      storeEcharts.setOption(this.storeOption);
+      });
     },
-  },
+    // 获取服务商列表
+    getServiceList() {
+      this.$get("/sp/list", {
+        name: "",
+        currentPage: 1,
+        pageSize: 200,
+      }).then((res) => {
+        console.log(res);
+        this.ServiceList = res.data;
+      });
+    },
+    //获取网点列表
+    getStoreList() {
+      this.$get("/store/list", {
+        name: this.storeName,
+        currentPage: 1,
+        pageSize: 200,
+      }).then((res) => {
+        this.StoreList = res.data;
+      });
+    },
+    //营业汇总时间导出
+    importData(){
+      var date = new Date();
+      var y = date.getFullYear();
+      this.$getExcel("/order/exportIncomeByYearExcel",{
+        year: this.fileYear == "" ? y : this.fileYear
+      })
+    },
+},
+
   mounted: function () {
     this.searchData();
+    this.getServiceList();
+    this.getStoreList();
   },
 };
 </script>
@@ -311,6 +653,14 @@ export default {
 .echarts-box {
   height: 300px;
   width: 100%;
+}
+.service-echart {
+  width: 1000px;
+  height: 500px;
+}
+.store-echart {
+  width: 1000px;
+  height: 500px;
 }
 
 .dateWidth {
