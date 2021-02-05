@@ -22,6 +22,8 @@ import FlowDetails from '@/view/FlowDetails'
 import IntelligentCabinet from '@/view/IntelligentCabinet'
 // 活动宣传
 import ActivityPropaganda from '@/view/ActivityPropaganda'
+//反馈建议
+import FeedBack from '@/view/FeedBack'
 
 
 Vue.use(Router)
@@ -79,6 +81,11 @@ export default new Router({
           path: 'cooperation',
           name: '合作宣传',
           component: cooperation
+        },
+        {
+          path: 'FeedBack',
+          name:'反馈建议',
+          component:FeedBack
         },
         {
           path: 'ActivityPropaganda',

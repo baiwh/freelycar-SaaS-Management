@@ -450,7 +450,9 @@
             <el-table-column label="服务网点">
               <template slot-scope="scope">
                 <div v-for="(item, index) in scope.row.stores" :key="index">
-                  <span>{{ item.name }}</span>
+                  <span v-show="index<3">{{ item.name }}</span>
+                  <span v-show="index >=3 && showList.indexOf(scope.$index)>-1">{{item.name}}</span>
+                  <span class="showmore" v-show="index >=3 && index==scope.row.stores.length-1 && showList.indexOf(scope.$index)<=-1" @click="showmore(scope.$index)">...更多</span>
                 </div>
               </template>
             </el-table-column>
@@ -823,6 +825,7 @@ export default {
       rspId: "",
       technicianserviceStore: [],
       projectName: "",
+      showList:[],
     };
   },
   methods: {
@@ -842,6 +845,10 @@ export default {
         this.servicePageData.pageTotal = res.total;
       });
       console.log("获取数据");
+    },
+    showmore(index){
+      console.log(index);
+      this.showList.push(index);
     },
     //修改服务商服务状态
     changeServiceStatus(row) {
@@ -1029,6 +1036,8 @@ export default {
     //服务、网点、技师模块
     //跳转至标签页
     toTabs(tab, row) {
+      //情况技师服务网点展开列表
+      this.showList =[];
       this.tabShow = !this.tabShow;
       this.activeName = tab;
       this.rspId = row.id;
@@ -1468,5 +1477,8 @@ export default {
 .minwidth{
   width : 100%;
   min-width: 1000px;
+}
+.showmore{
+  color: #409EFF;
 }
 </style>
