@@ -167,7 +167,7 @@
     </el-row>
     <!-- 网点 -->
     <el-row v-show="tabItemPosition == 'store'">
-      <div class="store-echart" id="storeEcharts"></div>
+      <div class="store-echart" :style="{width:'1000px'}" id="storeEcharts"></div>
     </el-row>
     <el-row v-show="tabItemPosition == 'store' && !store ">
       <el-table :data="storeList" border style="width: 93%">
@@ -607,6 +607,8 @@ export default {
       };
       console.log("查询网点");
       let storeEcharts = echarts.init(document.getElementById("storeEcharts"));
+      this.autoHeight = this.storeList.length?(this.storeList.length * 50+100):0; 
+      storeEcharts.resize({height:this.autoHeight}); 
       storeEcharts.setOption(this.storeOption);
       });
     },
@@ -656,11 +658,11 @@ export default {
 }
 .service-echart {
   width: 1000px;
-  height: 500px;
+  height: 1000px;
 }
 .store-echart {
   width: 1000px;
-  height: 500px;
+  // height: 1000px;
 }
 
 .dateWidth {

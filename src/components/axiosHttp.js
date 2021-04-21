@@ -1,8 +1,8 @@
 import axios from 'axios'
 import {Message} from 'element-ui'
 
-var api = "/test";
-// var api = "/api";
+// var api = "/test";
+var api = "/api";
 
 export function get(url, params = {}) {
   return new Promise((resolve, reject) => {

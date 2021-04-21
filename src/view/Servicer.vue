@@ -375,7 +375,7 @@
             </el-table-column>
           </el-table>
           <el-row style="height: 82px">
-            <pagingDevice :pageData.sync="itemPageData"></pagingDevice>
+            <pagingDevice :pageData.sync="itemPageData" @changePage="getItemList"></pagingDevice>
           </el-row>
         </el-tab-pane>
         <!-- 技师管理模块 -->
